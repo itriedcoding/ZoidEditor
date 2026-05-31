@@ -44,6 +44,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('terminal:exit', handler);
       return () => ipcRenderer.removeListener('terminal:exit', handler);
     },
+    onShell: (callback) => {
+      const handler = (_, name) => callback(name);
+      ipcRenderer.on('terminal:shell', handler);
+      return () => ipcRenderer.removeListener('terminal:shell', handler);
+    },
   },
   // ========== GITHUB AUTH (via main process) ==========
   github: {

@@ -9,6 +9,7 @@ function TerminalPanel() {
   const fitRef = useRef<FitAddon | null>(null);
   const cleanupRef = useRef<(() => void)[]>([]);
   const shellRef = useRef<boolean>(false);
+  const shellNameRef = useRef<string>('...');
 
   useEffect(() => {
     if (!containerRef.current || xtermRef.current) return;
@@ -43,12 +44,25 @@ function TerminalPanel() {
     setTimeout(() => term.focus(), 50);
 
     const fitTerminal = () => {
-      try { fitAddon.fit(); } catch {}
+      try {
+        fitAddon.fit();
+        const dims = fitAddon.proposeDimensions();
+        if (dims) {
+          api.terminal.resize(dims.cols, dims.rows);
+        }
+      } catch {}
     };
     requestAnimationFrame(fitTerminal);
 
     term.writeln('Zoid Editor Terminal');
     term.writeln('Starting shell...\r\n');
+
+    // Listen for detected shell name
+    const removeShell = api.terminal.onShell((name: string) => {
+      shellNameRef.current = name;
+      const el = containerRef.current?.querySelector('.terminal-shell-name');
+      if (el) el.textContent = name;
+    });
 
     // Register output listener BEFORE starting shell
     const removeData = api.terminal.onData((data: string) => {
@@ -68,7 +82,7 @@ function TerminalPanel() {
       shellRef.current = false;
     });
 
-    cleanupRef.current.push(removeData, removeExit);
+    cleanupRef.current.push(removeData, removeExit, removeShell);
 
     // Handle input from user keystrokes -> send raw UTF-8 string to shell
     term.onData((data) => {
@@ -78,9 +92,12 @@ function TerminalPanel() {
     });
 
     // Start shell
-    api.terminal.start().then(() => {
+    const dims = fitAddon.proposeDimensions();
+    api.terminal.start(dims?.cols || 80, dims?.rows || 24).then((result: { name: string }) => {
       shellRef.current = true;
-      // Re-focus after shell starts
+      shellNameRef.current = result.name;
+      const el = containerRef.current?.querySelector('.terminal-shell-name');
+      if (el) el.textContent = result.name;
       setTimeout(() => term.focus(), 100);
     }).catch((err: any) => {
       term.writeln(`\r\n\x1b[31mFailed to start shell: ${err.message}\x1b[0m`);
@@ -116,7 +133,7 @@ function TerminalPanel() {
           <span>Terminal</span>
         </div>
         <div className="terminal-header-center">
-          <span className="terminal-shell-name">powershell</span>
+          <span className="terminal-shell-name">...</span>
         </div>
         <div className="terminal-header-right">
           <button className="term-btn" title="New Terminal" onClick={() => {
@@ -126,9 +143,13 @@ function TerminalPanel() {
               shellRef.current = false;
               const a = (window as any).electronAPI;
               if (a?.terminal) {
+                const dims = fitRef.current?.proposeDimensions();
                 a.terminal.kill().then(() =>
-                  a.terminal.start().then(() => {
+                  a.terminal.start(dims?.cols || 80, dims?.rows || 24).then((result: { name: string }) => {
                     shellRef.current = true;
+                    shellNameRef.current = result.name;
+                    const el = containerRef.current?.querySelector('.terminal-shell-name');
+                    if (el) el.textContent = result.name;
                     t.focus();
                   })
                 );

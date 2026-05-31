@@ -801,21 +801,62 @@ ipcMain.handle('git:close', async () => {
 
 // ========== REAL TERMINAL ==========
 let shellProcess = null;
-let shellBuffer = '';
+let shellProcessInfo = { shell: '', name: '' };
 
-function startShell(win) {
+function detectShell() {
+  const isWin = process.platform === 'win32';
+  const isMac = process.platform === 'darwin';
+
+  if (isWin) {
+    // Windows: pwsh (PowerShell Core) > powershell.exe > cmd.exe
+    try {
+      const pwshPath = require('child_process').execSync('where pwsh.exe 2>nul', { encoding: 'utf-8' }).trim().split('\n')[0];
+      if (pwshPath) return { shell: pwshPath, name: 'pwsh' };
+    } catch {}
+    const psPath = path.join(process.env.WINDIR || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+    if (fs.existsSync(psPath)) return { shell: psPath, name: 'powershell' };
+    return { shell: process.env.COMSPEC || 'cmd.exe', name: 'cmd' };
+  }
+
+  if (isMac) {
+    // macOS: respect SHELL env, fallback to zsh (default since Catalina)
+    const sh = process.env.SHELL || '';
+    if (sh) return { shell: sh, name: path.basename(sh) };
+    if (fs.existsSync('/bin/zsh')) return { shell: '/bin/zsh', name: 'zsh' };
+    return { shell: '/bin/bash', name: 'bash' };
+  }
+
+  // Linux: respect SHELL env, fallback to bash then sh
+  const sh = process.env.SHELL || '';
+  if (sh) return { shell: sh, name: path.basename(sh) };
+  if (fs.existsSync('/bin/bash')) return { shell: '/bin/bash', name: 'bash' };
+  return { shell: '/bin/sh', name: 'sh' };
+}
+
+function startShell(win, cols, rows) {
   return new Promise((resolve, reject) => {
-    const shell = process.platform === 'win32'
-      ? (process.env.COMSPEC || 'cmd.exe')
-      : (process.env.SHELL || '/bin/bash');
-    const args = process.platform === 'win32' ? [] : [];
+    const { shell, name } = detectShell();
+    shellProcessInfo = { shell, name };
+    const isWin = process.platform === 'win32';
+    const args = isWin ? [] : ['--login'];
 
     try {
       const { spawn } = require('child_process');
       shellProcess = spawn(shell, args, {
         stdio: ['pipe', 'pipe', 'pipe'],
-        env: { ...process.env, TERM: 'xterm-256color' },
+        env: {
+          ...process.env,
+          TERM: 'xterm-256color',
+          COLUMNS: String(cols || 80),
+          LINES: String(rows || 24),
+        },
+        windowsHide: false,
       });
+
+      // Send shell name to renderer
+      if (win && !win.isDestroyed()) {
+        win.webContents.send('terminal:shell', name);
+      }
 
       shellProcess.stdout.on('data', (data) => {
         if (win && !win.isDestroyed()) {
@@ -848,13 +889,13 @@ function startShell(win) {
   });
 }
 
-ipcMain.handle('terminal:start', async () => {
+ipcMain.handle('terminal:start', async (_, cols, rows) => {
   if (shellProcess) {
     shellProcess.kill();
     shellProcess = null;
   }
-  await startShell(mainWindow);
-  return true;
+  await startShell(mainWindow, cols || 80, rows || 24);
+  return { name: shellProcessInfo.name };
 });
 
 ipcMain.handle('terminal:stdin', (_, data) => {
@@ -864,9 +905,18 @@ ipcMain.handle('terminal:stdin', (_, data) => {
 });
 
 ipcMain.handle('terminal:resize', (_, cols, rows) => {
-  if (shellProcess && shellProcess.stdout) {
-    try { shellProcess.stdout.setCols?.(cols); } catch {}
-    try { shellProcess.stderr.setCols?.(cols); } catch {}
+  if (shellProcess) {
+    if (process.platform !== 'win32') {
+      try { process.kill(shellProcess.pid, 'SIGWINCH'); } catch {}
+    }
+    if (shellProcess.stdout) {
+      try { shellProcess.stdout.columns = cols; } catch {}
+      try { shellProcess.stdout.rows = rows; } catch {}
+    }
+    if (shellProcess.stderr) {
+      try { shellProcess.stderr.columns = cols; } catch {}
+      try { shellProcess.stderr.rows = rows; } catch {}
+    }
   }
 });
 
