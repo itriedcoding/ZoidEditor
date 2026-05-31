@@ -82,42 +82,42 @@
       <p>Built from the ground up for modern development workflows.</p>
     </div>
     <div class="features-grid">
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="Monaco Editor">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/></svg>
         </div>
         <h3>Monaco Editor</h3>
         <p>Syntax highlighting, IntelliSense, multi-cursor editing, and code folding for every language.</p>
       </div>
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="Real Terminal">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         </div>
         <h3>Real Terminal</h3>
         <p>Integrated xterm.js terminal connected to your system shell with full color and Unicode support.</p>
       </div>
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="AI-Powered">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
         <h3>AI-Powered</h3>
         <p>Chat with multiple AI models simultaneously. Bring your own key or use free OpenRouter models.</p>
       </div>
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="VS Code Extensions">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
         </div>
         <h3>VS Code Extensions</h3>
         <p>Browse and install extensions from the Open VSX registry directly within the editor.</p>
       </div>
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="Git Integration">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
         <h3>Git Integration</h3>
         <p>Full Git workflow: stage, commit, branch, push, pull &mdash; all from the built-in source control panel.</p>
       </div>
-      <div class="feature-card glass reveal">
+      <div class="feature-card glass reveal" data-feature="Glassmorphism UI">
         <div class="feature-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
         </div>
@@ -148,44 +148,94 @@
   <section class="dashboard" id="dashboard">
     <div class="section-header reveal">
       <h2>Dashboard</h2>
-      <p>Live project stats and community activity.</p>
+      <p id="dashSubtitle">Sign in with GitHub to access your personal dashboard.</p>
     </div>
-    <div class="dashboard-grid">
-      <div class="dash-card glass reveal" id="dashStars">
+
+    <!-- Public stats (always shown) -->
+    <div class="dash-public-grid" id="dashPublic">
+      <div class="dash-card glass reveal">
         <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <span class="dash-num" id="dashStarsNum">--</span>
         <span class="dash-label">GitHub Stars</span>
       </div>
-      <div class="dash-card glass reveal" id="dashForks">
+      <div class="dash-card glass reveal">
         <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="3" ry="2.5"/><ellipse cx="6" cy="19" rx="3" ry="2.5"/><ellipse cx="18" cy="19" rx="3" ry="2.5"/><line x1="12" y1="7.5" x2="12" y2="12"/><line x1="8" y1="17" x2="6.5" y2="15"/><line x1="16" y1="17" x2="17.5" y2="15"/></svg></div>
         <span class="dash-num" id="dashForksNum">--</span>
         <span class="dash-label">Forks</span>
       </div>
-      <div class="dash-card glass reveal" id="dashVersion">
-        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <span class="dash-num" id="dashVersionNum">--</span>
-        <span class="dash-label">Latest Version</span>
-      </div>
-      <div class="dash-card glass reveal" id="dashDownloads">
+      <div class="dash-card glass reveal">
         <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
         <span class="dash-num" id="dashDownloadsNum">--</span>
         <span class="dash-label">Total Downloads</span>
       </div>
-      <div class="dash-card glass reveal" id="dashVisits">
-        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <span class="dash-num" id="dashVisitsNum">--</span>
-        <span class="dash-label">Site Visits</span>
-      </div>
-      <div class="dash-card glass reveal" id="dashOpenIssues">
-        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <span class="dash-num" id="dashIssuesNum">--</span>
-        <span class="dash-label">Open Issues</span>
+      <div class="dash-card glass reveal">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="dash-num" id="dashVersionNum">--</span>
+        <span class="dash-label">Latest Version</span>
       </div>
     </div>
-    <div class="dash-user" id="dashUser" style="display:none">
-      <img id="dashUserAvatar" alt="" width="40" height="40">
-      <span id="dashUserName"></span>
-      <button class="btn-secondary" onclick="signOutGitHub()" style="padding:6px 18px;font-size:12px">Sign Out</button>
+
+    <!-- Personal dashboard (hidden until login) -->
+    <div class="dash-personal" id="dashPersonal" style="display:none">
+      <!-- Profile row -->
+      <div class="dash-profile glass reveal">
+        <img id="dashAvatar" alt="" width="56" height="56">
+        <div class="dash-profile-info">
+          <span id="dashDisplayName"></span>
+          <span id="dashLogin" class="dash-login"></span>
+        </div>
+        <button class="btn-secondary" onclick="signOutGitHub()" style="padding:8px 20px;font-size:12px;margin-left:auto">Sign Out</button>
+      </div>
+
+      <!-- Usage stats -->
+      <h3 class="dash-section-title reveal">Your Usage</h3>
+      <div class="dash-personal-grid">
+        <div class="dash-card glass reveal">
+          <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <span class="dash-num" id="dashMyVisits">--</span>
+          <span class="dash-label">Site Visits</span>
+        </div>
+        <div class="dash-card glass reveal">
+          <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+          <span class="dash-num" id="dashMyDownloads">--</span>
+          <span class="dash-label">Downloads</span>
+        </div>
+        <div class="dash-card glass reveal">
+          <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+          <span class="dash-num" id="dashMyFeatures">--</span>
+          <span class="dash-label">Features Explored</span>
+        </div>
+        <div class="dash-card glass reveal">
+          <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <span class="dash-num" id="dashMyTime">--</span>
+          <span class="dash-label">Total Time</span>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <h3 class="dash-section-title reveal">Settings</h3>
+      <div class="dash-settings glass reveal">
+        <label class="dash-setting">
+          <span>Website Theme</span>
+          <div class="dash-toggle-group">
+            <button class="dash-toggle-btn active" data-theme="dark" onclick="setWebsiteTheme('dark')">Dark</button>
+            <button class="dash-toggle-btn" data-theme="light" onclick="setWebsiteTheme('light')">Light</button>
+          </div>
+        </label>
+        <label class="dash-setting">
+          <span>Download Notifications</span>
+          <label class="dash-switch">
+            <input type="checkbox" id="dashNotifyToggle" onchange="toggleNotify(this.checked)">
+            <span class="dash-slider"></span>
+          </label>
+        </label>
+      </div>
+
+      <!-- Activity log -->
+      <h3 class="dash-section-title reveal">Recent Activity</h3>
+      <div class="dash-activity glass reveal" id="dashActivity">
+        <p class="dash-activity-empty">No activity yet. Explore the site to see your activity here.</p>
+      </div>
     </div>
   </section>
 
