@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useStore } from '../store';
+import { useStore, AIModel } from '../store';
 import { IconCheck, IconX, IconAI, IconSettings as IconSettingsIcon, IconExplorer, IconTerminal } from './Icons';
 
 function Settings() {
   const { settings, customModels, updateSettings, addCustomModel, removeCustomModel, toggleSettings, notify } = useStore();
   const [section, setSection] = useState<'keys' | 'editor' | 'ai' | 'about'>('keys');
   const [showAddModel, setShowAddModel] = useState(false);
-  const [newModel, setNewModel] = useState({ name: '', provider: 'openai' as const, model: '', baseUrl: '' });
+  const [newModel, setNewModel] = useState<{ name: string; provider: AIModel['provider']; model: string; baseUrl: string }>({ name: '', provider: 'openai', model: '', baseUrl: '' });
 
   const keys = [
     { key: 'openaiKey', label: 'OpenAI API Key', placeholder: 'sk-...' },
@@ -129,7 +129,7 @@ function Settings() {
                 {showAddModel && (
                   <div className="add-model-form">
                     <input placeholder="Model name" value={newModel.name} onChange={e => setNewModel({ ...newModel, name: e.target.value })} />
-                    <select value={newModel.provider} onChange={e => setNewModel({ ...newModel, provider: e.target.value as any })}>
+                    <select value={newModel.provider} onChange={e => setNewModel({ ...newModel, provider: e.target.value as AIModel['provider'] })}>
                       <option value="openai">OpenAI Compatible</option>
                       <option value="anthropic">Anthropic</option>
                       <option value="google">Google AI</option>

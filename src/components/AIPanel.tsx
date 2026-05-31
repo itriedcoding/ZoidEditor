@@ -260,6 +260,7 @@ function FormattedContent({ content, onCopy, copiedId, msgId }: {
   content: string; onCopy?: (text: string) => void; copiedId?: string | null; msgId?: string;
 }) {
   const applySuggestion = useStore(s => s.applySuggestion);
+  const notify = useStore(s => s.notify);
   const parts = content.split(/(```\w*\n[\s\S]*?```)/g);
   return (
     <>

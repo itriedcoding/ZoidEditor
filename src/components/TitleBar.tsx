@@ -49,7 +49,7 @@ function TitleBar() {
 
         <div className="titlebar-end">
           <div className="tb-actions">
-            <button className={`tb-btn ${view === 'settings' ? 'active' : ''}`} onClick={() => toggleSettings()} title="Settings (Ctrl+,)">
+            <button className={`tb-btn ${view.settings ? 'active' : ''}`} onClick={() => toggleSettings()} title="Settings (Ctrl+,)">
               <IconSettings size={15} />
             </button>
             <button className="tb-btn" onClick={() => toggleAIPanel()} title="AI Assistant (Ctrl+J)">
