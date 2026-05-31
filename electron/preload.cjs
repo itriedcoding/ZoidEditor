@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getVersion: () => ipcRenderer.invoke('app:getVersion'),
     getPath: (name) => ipcRenderer.invoke('app:getPath', name),
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
+    capturePage: () => ipcRenderer.invoke('app:capturePage'),
   },
   // ========== REAL TERMINAL ==========
   terminal: {
