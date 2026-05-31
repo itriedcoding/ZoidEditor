@@ -83,6 +83,15 @@ export async function sendMessage(req: AIRequest, onStream?: (chunk: string) => 
       body.max_tokens = maxTokens;
       break;
 
+    case 'groq':
+      url = 'https://api.groq.com/openai/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${key}`;
+      body.model = model.model;
+      body.messages = wrappedMessages.map(m => ({ role: m.role, content: m.content }));
+      body.temperature = temperature;
+      body.max_tokens = maxTokens;
+      break;
+
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }
@@ -160,6 +169,7 @@ export function getApiKey(model: AIModel, settings: any): string {
     case 'anthropic': return settings.anthropicKey;
     case 'google': return settings.googleKey;
     case 'openrouter': return settings.openrouterKey;
+    case 'groq': return settings.groqKey;
     case 'ollama': return settings.ollamaUrl;
     case 'lmstudio': return settings.lmstudioUrl;
     default: return '';

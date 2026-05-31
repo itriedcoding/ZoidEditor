@@ -21,11 +21,28 @@ export interface AIChatMessage {
 export interface AIModel {
   id: string;
   name: string;
-  provider: 'openai' | 'anthropic' | 'google' | 'ollama' | 'lmstudio' | 'openrouter';
+  provider: 'openai' | 'anthropic' | 'google' | 'ollama' | 'lmstudio' | 'openrouter' | 'groq';
   model: string;
   apiKey?: string;
   baseUrl?: string;
   isFree?: boolean;
+}
+
+export interface MCPServer {
+  id: string;
+  name: string;
+  command: string;
+  args: string;
+  enabled: boolean;
+  tools?: any[];
+}
+
+export interface Snippet {
+  id: string;
+  title: string;
+  code: string;
+  language: string;
+  description: string;
 }
 
 export interface Settings {
@@ -33,6 +50,7 @@ export interface Settings {
   anthropicKey: string;
   googleKey: string;
   openrouterKey: string;
+  groqKey: string;
   ollamaUrl: string;
   lmstudioUrl: string;
   fontSize: number;
@@ -48,7 +66,7 @@ export interface Settings {
 }
 
 const defaultSettings: Settings = {
-  openaiKey: '', anthropicKey: '', googleKey: '', openrouterKey: '',
+  openaiKey: '', anthropicKey: '', googleKey: '', openrouterKey: '', groqKey: '',
   ollamaUrl: 'http://localhost:11434', lmstudioUrl: 'http://localhost:1234',
   fontSize: 14, tabSize: 2, wordWrap: 'on', minimap: 'small', lineNumbers: 'on',
   autoSave: false, theme: 'black-white', aiModel: 'openrouter-deepseek',
@@ -122,6 +140,10 @@ interface AppState {
     currentBranch: string;
     log: any[];
   };
+  mcpServers: MCPServer[];
+  snippets: Snippet[];
+  mcpView: boolean;
+  snippetsView: boolean;
 
   addTab: (tab: Omit<Tab, 'id' | 'isDirty'>) => void;
   closeTab: (id: string) => void;
@@ -160,6 +182,14 @@ interface AppState {
   toggleGitView: () => void;
   setGitState: (state: Partial<AppState['gitState']>) => void;
   setOpenFolder: (folder: string | null) => void;
+  addMCP: (server: MCPServer) => void;
+  removeMCP: (id: string) => void;
+  updateMCP: (id: string, partial: Partial<MCPServer>) => void;
+  toggleMCP: (id: string) => void;
+  addSnippet: (snippet: Snippet) => void;
+  removeSnippet: (id: string) => void;
+  toggleMCPView: () => void;
+  toggleSnippetsView: () => void;
 }
 
 const loadSettings = (): Settings => {
@@ -183,25 +213,66 @@ const loadCustomModels = (): AIModel[] => {
   } catch { return []; }
 };
 
+const loadMCPServers = (): MCPServer[] => {
+  try {
+    const saved = localStorage.getItem('zoid-mcp-servers');
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+};
+
+const loadSnippets = (): Snippet[] => {
+  try {
+    const saved = localStorage.getItem('zoid-snippets');
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+};
+
 const freeModels: AIModel[] = [
   { id: 'openrouter-deepseek', name: 'DeepSeek V3', provider: 'openrouter', model: 'deepseek/deepseek-chat', isFree: true },
   { id: 'openrouter-llama', name: 'Llama 3.3 70B', provider: 'openrouter', model: 'meta-llama/llama-3.3-70b-instruct', isFree: true },
   { id: 'openrouter-mixtral', name: 'Mixtral 8x7B', provider: 'openrouter', model: 'mistralai/mixtral-8x7b-instruct', isFree: true },
   { id: 'openrouter-qwen', name: 'Qwen 2.5 72B', provider: 'openrouter', model: 'qwen/qwen-2.5-72b-instruct', isFree: true },
   { id: 'openrouter-gemma', name: 'Gemma 2 9B', provider: 'openrouter', model: 'google/gemma-2-9b-it', isFree: true },
+  { id: 'openrouter-deepseek-r1', name: 'DeepSeek R1', provider: 'openrouter', model: 'deepseek/deepseek-r1', isFree: true },
+  { id: 'openrouter-gemma3', name: 'Gemma 3 27B', provider: 'openrouter', model: 'google/gemma-3-27b-it', isFree: true },
+  { id: 'openrouter-command-r', name: 'Command R+', provider: 'openrouter', model: 'cohere/command-r-plus-v02', isFree: true },
 ];
 
 const apiKeyModels: AIModel[] = [
+  // OpenAI
   { id: 'byok-gpt4o', name: 'GPT-4o', provider: 'openai', model: 'gpt-4o' },
   { id: 'byok-gpt4o-mini', name: 'GPT-4o Mini', provider: 'openai', model: 'gpt-4o-mini' },
   { id: 'byok-gpt4-turbo', name: 'GPT-4 Turbo', provider: 'openai', model: 'gpt-4-turbo' },
-  { id: 'byok-claude-opus', name: 'Claude Opus', provider: 'anthropic', model: 'claude-opus-20240229' },
-  { id: 'byok-claude-sonnet', name: 'Claude Sonnet 4', provider: 'anthropic', model: 'claude-sonnet-4-20250514' },
-  { id: 'byok-claude-haiku', name: 'Claude Haiku', provider: 'anthropic', model: 'claude-3-5-haiku-20241022' },
-  { id: 'byok-gemini-pro', name: 'Gemini 1.5 Pro', provider: 'google', model: 'gemini-1.5-pro' },
-  { id: 'byok-gemini-ultra', name: 'Gemini 2.0 Pro', provider: 'google', model: 'gemini-2.0-pro-exp' },
+  { id: 'byok-gpt41', name: 'GPT-4.1', provider: 'openai', model: 'gpt-4.1' },
+  { id: 'byok-gpt41-mini', name: 'GPT-4.1 Mini', provider: 'openai', model: 'gpt-4.1-mini' },
+  { id: 'byok-gpt41-nano', name: 'GPT-4.1 Nano', provider: 'openai', model: 'gpt-4.1-nano' },
   { id: 'byok-o1', name: 'o1', provider: 'openai', model: 'o1' },
   { id: 'byok-o3-mini', name: 'o3-mini', provider: 'openai', model: 'o3-mini' },
+  { id: 'byok-o4-mini', name: 'o4-mini', provider: 'openai', model: 'o4-mini' },
+  { id: 'byok-o4', name: 'o4', provider: 'openai', model: 'o4' },
+  // Anthropic
+  { id: 'byok-claude-opus', name: 'Claude Opus', provider: 'anthropic', model: 'claude-opus-20240229' },
+  { id: 'byok-claude-sonnet', name: 'Claude Sonnet 4', provider: 'anthropic', model: 'claude-sonnet-4-20250514' },
+  { id: 'byok-claude-opus4', name: 'Claude Opus 4', provider: 'anthropic', model: 'claude-opus-4-20250514' },
+  { id: 'byok-claude-haiku', name: 'Claude Haiku', provider: 'anthropic', model: 'claude-3-5-haiku-20241022' },
+  // Google
+  { id: 'byok-gemini-pro', name: 'Gemini 1.5 Pro', provider: 'google', model: 'gemini-1.5-pro' },
+  { id: 'byok-gemini-ultra', name: 'Gemini 2.0 Pro', provider: 'google', model: 'gemini-2.0-pro-exp' },
+  { id: 'byok-gemini-25-pro', name: 'Gemini 2.5 Pro', provider: 'google', model: 'gemini-2.5-pro-preview-03-25' },
+  { id: 'byok-gemini-25-flash', name: 'Gemini 2.5 Flash', provider: 'google', model: 'gemini-2.5-flash-preview' },
+  { id: 'byok-gemini-20-flash', name: 'Gemini 2.0 Flash', provider: 'google', model: 'gemini-2.0-flash' },
+  // Groq
+  { id: 'byok-groq-llama', name: 'Groq Llama 3.3 70B', provider: 'groq', model: 'llama-3.3-70b-versatile' },
+  { id: 'byok-groq-mixtral', name: 'Groq Mixtral 8x7B', provider: 'groq', model: 'mixtral-8x7b-32768' },
+  { id: 'byok-groq-gemma2', name: 'Groq Gemma 2 9B', provider: 'groq', model: 'gemma2-9b-it' },
+  { id: 'byok-groq-deepseek', name: 'Groq DeepSeek R1', provider: 'groq', model: 'deepseek-r1-distill-llama-70b' },
+  { id: 'byok-groq-llama4', name: 'Groq Llama 4', provider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' },
+  // OpenRouter BYOK
+  { id: 'byok-or-llama4', name: 'Llama 4 Maverick', provider: 'openrouter', model: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
+  { id: 'byok-or-qwen-coder', name: 'Qwen 2.5 Coder 32B', provider: 'openrouter', model: 'qwen/qwen-2.5-coder-32b-instruct' },
+  { id: 'byok-or-mistral-large', name: 'Mistral Large', provider: 'openrouter', model: 'mistralai/mistral-large-2411' },
+  { id: 'byok-or-codestral', name: 'Codestral', provider: 'openrouter', model: 'mistralai/codestral-2505' },
+  { id: 'byok-or-wizardlm', name: 'WizardLM 2 8x22B', provider: 'openrouter', model: 'microsoft/wizardlm-2-8x22b' },
 ];
 
 const localModels: AIModel[] = [
@@ -233,6 +304,10 @@ export const useStore = create<AppState>((set, get) => ({
   findController: null,
   gitView: false,
   gitState: { isRepo: false, status: null, branches: [], currentBranch: '', log: [] },
+  mcpServers: loadMCPServers(),
+  snippets: loadSnippets(),
+  mcpView: false,
+  snippetsView: false,
 
   applySuggestion: (code) => {
     const s = get();
@@ -332,4 +407,55 @@ export const useStore = create<AppState>((set, get) => ({
   toggleGitView: () => set(s => ({ gitView: !s.gitView })),
   setGitState: (state) => set(s => ({ gitState: { ...s.gitState, ...state } })),
   setOpenFolder: (folder) => set({ openFolder: folder }),
+
+  addMCP: (server) => {
+    set(s => {
+      const nm = [...s.mcpServers, server];
+      try { localStorage.setItem('zoid-mcp-servers', JSON.stringify(nm)); } catch {}
+      return { mcpServers: nm };
+    });
+  },
+
+  removeMCP: (id) => {
+    set(s => {
+      const nm = s.mcpServers.filter(m => m.id !== id);
+      try { localStorage.setItem('zoid-mcp-servers', JSON.stringify(nm)); } catch {}
+      return { mcpServers: nm };
+    });
+  },
+
+  updateMCP: (id, partial) => {
+    set(s => {
+      const nm = s.mcpServers.map(m => m.id === id ? { ...m, ...partial } : m);
+      try { localStorage.setItem('zoid-mcp-servers', JSON.stringify(nm)); } catch {}
+      return { mcpServers: nm };
+    });
+  },
+
+  toggleMCP: (id) => {
+    set(s => {
+      const nm = s.mcpServers.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m);
+      try { localStorage.setItem('zoid-mcp-servers', JSON.stringify(nm)); } catch {}
+      return { mcpServers: nm };
+    });
+  },
+
+  addSnippet: (snippet) => {
+    set(s => {
+      const ns = [...s.snippets, snippet];
+      try { localStorage.setItem('zoid-snippets', JSON.stringify(ns)); } catch {}
+      return { snippets: ns };
+    });
+  },
+
+  removeSnippet: (id) => {
+    set(s => {
+      const ns = s.snippets.filter(sn => sn.id !== id);
+      try { localStorage.setItem('zoid-snippets', JSON.stringify(ns)); } catch {}
+      return { snippets: ns };
+    });
+  },
+
+  toggleMCPView: () => set(s => ({ mcpView: !s.mcpView })),
+  toggleSnippetsView: () => set(s => ({ snippetsView: !s.snippetsView })),
 }));

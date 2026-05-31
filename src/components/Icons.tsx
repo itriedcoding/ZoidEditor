@@ -416,6 +416,36 @@ export function IconInfo({ size = 16, className }: IconProps) {
   );
 }
 
+export function IconMCP({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
+      <rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M5 5h6v6H5z" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M8 8l-3 3M8 8l3 3M8 8l3-3M8 8l-3-3" stroke="currentColor" strokeWidth="0.8"/>
+    </svg>
+  );
+}
+
+export function IconSnippet({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
+      <path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M5 5h2v2H5zM9 5h2v2H9zM5 9h2v2H5zM9 9h2v2H9z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+export function IconPlug({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
+      <path d="M6 1v4M10 1v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <rect x="4" y="5" width="8" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M8 9v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      <circle cx="8" cy="14" r="1" stroke="currentColor" strokeWidth="1.2"/>
+    </svg>
+  );
+}
+
 export function getFolderIcon(expanded: boolean, size = 12, className?: string) {
   return expanded
     ? <IconChevronDown size={size} className={className} />

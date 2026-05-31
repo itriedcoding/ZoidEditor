@@ -831,3 +831,127 @@ ipcMain.handle('terminal:kill', () => {
     shellProcess = null;
   }
 });
+
+// ========== MCP SERVER (Model Context Protocol) ==========
+const { spawn } = require('child_process');
+const mcpProcesses = {};
+
+function mcpSendMessage(proc, msg) {
+  const data = JSON.stringify(msg);
+  const header = `Content-Length: ${Buffer.byteLength(data, 'utf-8')}\r\n\r\n`;
+  proc.stdin.write(header + data);
+}
+
+function mcpSetupProcess(name, proc, pendingRef, msgIdRef) {
+  let buffer = '';
+  const pending = {};
+  const msgId = { current: msgIdRef || 0 };
+  pendingRef.value = pending;
+  msgIdRef.value = msgId;
+
+  proc.stdout.on('data', (data) => {
+    buffer += data.toString();
+    while (buffer.length > 0) {
+      const match = buffer.match(/Content-Length: (\d+)\r\n\r\n/);
+      if (!match) break;
+      const len = parseInt(match[1], 10);
+      const headerEnd = match.index + match[0].length;
+      if (buffer.length < headerEnd + len) break;
+      const body = buffer.slice(headerEnd, headerEnd + len);
+      buffer = buffer.slice(headerEnd + len);
+      try {
+        const parsed = JSON.parse(body);
+        if (parsed.id !== undefined && pending[parsed.id]) {
+          pending[parsed.id].resolve(parsed);
+          delete pending[parsed.id];
+        }
+      } catch {}
+    }
+  });
+
+  proc.on('exit', () => {
+    delete mcpProcesses[name];
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('mcp:exited', name);
+    }
+  });
+
+  proc.on('error', (err) => {
+    delete mcpProcesses[name];
+  });
+}
+
+ipcMain.handle('mcp:start', async (_, config) => {
+  const { name, command, args } = config;
+  if (!name || !command) return { error: 'Name and command required' };
+  if (mcpProcesses[name]) return { error: 'Server already running' };
+
+  const argsArray = args ? args.split(' ').filter(a => a.trim()) : [];
+  const proc = spawn(command, argsArray, {
+    stdio: ['pipe', 'pipe', 'pipe'],
+    env: { ...process.env },
+  });
+
+  const pendingRef = { value: {} };
+  const msgIdRef = { value: 0 };
+  mcpSetupProcess(name, proc, pendingRef, msgIdRef);
+  mcpProcesses[name] = { proc, tools: [], pending: pendingRef.value, msgId: msgIdRef.value };
+
+  const mcpCall = (method, params, timeout = 10000) => {
+    return new Promise((resolve, reject) => {
+      const id = ++msgIdRef.value;
+      const timer = setTimeout(() => reject(new Error(`${method} timeout`)), timeout);
+      pendingRef.value[id] = {
+        resolve: (res) => { clearTimeout(timer); resolve(res); },
+        reject: (err) => { clearTimeout(timer); reject(err); },
+      };
+      mcpSendMessage(proc, { jsonrpc: '2.0', id, method, params: params || {} });
+    });
+  };
+
+  try {
+    await mcpCall('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'zoid-editor', version: '1.0.0' } });
+    mcpSendMessage(proc, { jsonrpc: '2.0', method: 'notifications/initialized' });
+    const toolsResult = await mcpCall('tools/list', {}, 15000);
+    const tools = toolsResult.result?.tools || [];
+    mcpProcesses[name].tools = tools;
+    return { success: true, tools };
+  } catch (err) {
+    proc.kill();
+    delete mcpProcesses[name];
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('mcp:stop', async (_, name) => {
+  if (mcpProcesses[name]) {
+    mcpProcesses[name].proc.kill();
+    delete mcpProcesses[name];
+  }
+  return { success: true };
+});
+
+ipcMain.handle('mcp:listTools', async (_, name) => {
+  if (!mcpProcesses[name]) return { error: 'Server not running', tools: [] };
+  return { tools: mcpProcesses[name].tools };
+});
+
+ipcMain.handle('mcp:callTool', async (_, name, toolName, args) => {
+  if (!mcpProcesses[name]) return { error: 'Server not running' };
+  const server = mcpProcesses[name];
+  const id = ++server.msgId;
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve({ error: 'Tool call timeout' }), 30000);
+    server.pending[id] = {
+      resolve: (res) => { clearTimeout(timer); resolve({ result: res.result }); },
+      reject: () => { clearTimeout(timer); resolve({ error: 'Tool call failed' }); },
+    };
+    mcpSendMessage(server.proc, { jsonrpc: '2.0', id, method: 'tools/call', params: { name: toolName, arguments: args || {} } });
+  });
+});
+
+ipcMain.handle('mcp:status', async () => {
+  return Object.entries(mcpProcesses).map(([name, server]) => ({
+    name, running: true, tools: server.tools,
+  }));
+});

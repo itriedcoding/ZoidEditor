@@ -1,14 +1,16 @@
 import { useStore } from '../store';
-import { IconExplorer, IconSearch, IconBranch, IconTerminal, IconSettings, IconAI, IconExtensions } from './Icons';
+import { IconExplorer, IconSearch, IconBranch, IconTerminal, IconSettings, IconAI, IconExtensions, IconPlug, IconSnippet } from './Icons';
 
 function ActivityBar() {
-  const { view, toggleExplorer, toggleAIPanel, toggleTerminal, toggleSettings, toggleExtensionsView, toggleFindReplace, extensionsView, gitView, toggleGitView } = useStore();
+  const { view, toggleExplorer, toggleAIPanel, toggleTerminal, toggleSettings, toggleExtensionsView, toggleFindReplace, extensionsView, gitView, toggleGitView, mcpView, toggleMCPView, snippetsView, toggleSnippetsView } = useStore();
 
   const items = [
     { id: 'explorer', icon: IconExplorer, title: 'Explorer (Ctrl+B)', active: view.explorer, onClick: toggleExplorer },
     { id: 'extensions', icon: IconExtensions, title: 'Extensions', active: extensionsView, onClick: toggleExtensionsView },
     { id: 'search', icon: IconSearch, title: 'Search (Ctrl+F)', active: view.findReplace, onClick: toggleFindReplace },
     { id: 'source-control', icon: IconBranch, title: 'Source Control (Git)', active: gitView, onClick: toggleGitView },
+    { id: 'mcp', icon: IconPlug, title: 'MCP Servers', active: mcpView, onClick: toggleMCPView },
+    { id: 'snippets', icon: IconSnippet, title: 'Snippets', active: snippetsView, onClick: toggleSnippetsView },
     { id: 'ai', icon: IconAI, title: 'AI Assistant (Ctrl+J)', active: view.aiPanel, onClick: toggleAIPanel },
     { id: 'terminal', icon: IconTerminal, title: 'Terminal (Ctrl+`)', active: view.terminal, onClick: toggleTerminal },
   ];

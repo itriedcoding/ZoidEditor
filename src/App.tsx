@@ -6,6 +6,8 @@ import Sidebar from './components/Sidebar';
 import TabBar from './components/TabBar';
 import Editor from './components/Editor';
 import AIPanel from './components/AIPanel';
+import MCPServerPanel from './components/MCPServerPanel';
+import SnippetsPanel from './components/SnippetsPanel';
 import Settings from './components/Settings';
 import TerminalPanel from './components/Terminal';
 import StatusBar from './components/StatusBar';
@@ -27,6 +29,7 @@ function App() {
     setFileTree, toggleAIPanel, toggleSettings, toggleTerminal,
     toggleExplorer, toggleFindReplace, toggleCommandPalette, closeCommandPalette,
     showContextMenu, updateSettings, gitView, openFolder, setOpenFolder,
+    mcpView, snippetsView,
   } = useStore();
 
   const handleOpenFile = useCallback(async (filePath: string) => {
@@ -297,6 +300,12 @@ function App() {
         </div>
         <div className={`sidebar-wrap ${gitView ? 'visible' : 'hidden'}`}>
           <SourceControl />
+        </div>
+        <div className={`sidebar-wrap ${mcpView ? 'visible' : 'hidden'}`}>
+          <MCPServerPanel />
+        </div>
+        <div className={`sidebar-wrap ${snippetsView ? 'visible' : 'hidden'}`}>
+          <SnippetsPanel />
         </div>
         <div className="main-area">
           {view.findReplace && <FindReplace />}

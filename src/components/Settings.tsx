@@ -12,6 +12,7 @@ function Settings() {
     { key: 'openaiKey', label: 'OpenAI API Key', placeholder: 'sk-...' },
     { key: 'anthropicKey', label: 'Anthropic API Key', placeholder: 'sk-ant-...' },
     { key: 'googleKey', label: 'Google AI Key', placeholder: 'AIza...' },
+    { key: 'groqKey', label: 'Groq API Key', placeholder: 'gsk_...' },
     { key: 'openrouterKey', label: 'OpenRouter API Key', placeholder: 'sk-or-...' },
   ];
 

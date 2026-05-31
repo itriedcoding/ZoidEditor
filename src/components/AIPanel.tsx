@@ -89,7 +89,7 @@ function AIPanel() {
 
   const groupedModels = {
     free: aiModels.filter(m => m.isFree),
-    byok: aiModels.filter(m => !m.isFree && (m.provider === 'openai' || m.provider === 'anthropic' || m.provider === 'google')),
+    byok: aiModels.filter(m => !m.isFree && (m.provider === 'openai' || m.provider === 'anthropic' || m.provider === 'google' || m.provider === 'groq')),
     local: aiModels.filter(m => m.provider === 'ollama' || m.provider === 'lmstudio'),
     custom: customModels,
   };
@@ -131,6 +131,7 @@ function AIPanel() {
                 <option value="openai">OpenAI</option>
                 <option value="anthropic">Anthropic</option>
                 <option value="google">Google AI</option>
+                <option value="groq">Groq</option>
                 <option value="ollama">Ollama</option>
                 <option value="lmstudio">LM Studio</option>
                 <option value="openrouter">OpenRouter</option>

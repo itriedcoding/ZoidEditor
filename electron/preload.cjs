@@ -86,6 +86,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
     list: () => ipcRenderer.invoke('extensions:list'),
     uninstall: (name) => ipcRenderer.invoke('extensions:uninstall', name),
   },
+  // ========== MCP SERVER ==========
+  mcp: {
+    start: (config) => ipcRenderer.invoke('mcp:start', config),
+    stop: (name) => ipcRenderer.invoke('mcp:stop', name),
+    listTools: (name) => ipcRenderer.invoke('mcp:listTools', name),
+    callTool: (name, toolName, args) => ipcRenderer.invoke('mcp:callTool', name, toolName, args),
+    status: () => ipcRenderer.invoke('mcp:status'),
+    onExited: (callback) => {
+      const handler = (_, name) => callback(name);
+      ipcRenderer.on('mcp:exited', handler);
+      return () => ipcRenderer.removeListener('mcp:exited', handler);
+    },
+  },
   // Listen for menu actions from main process
   onMenuAction: (callback) => {
     const handler = (_, action) => callback(action);
