@@ -45,6 +45,7 @@ function getTracker(key, def) {
 function setTracker(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
 function trackVisit() {
+  if (!trackingEnabled) return;
   const visits = getTracker('zd_visits', 0) + 1;
   setTracker('zd_visits', visits);
   const first = getTracker('zd_firstVisit', Date.now());
@@ -56,6 +57,7 @@ function trackVisit() {
 trackVisit();
 
 function trackDownload() {
+  if (!trackingEnabled) return;
   const dls = getTracker('zd_downloads', 0) + 1;
   setTracker('zd_downloads', dls);
   const activity = getTracker('zd_activity', []);
@@ -64,6 +66,7 @@ function trackDownload() {
 }
 
 function trackFeature(name) {
+  if (!trackingEnabled) return;
   const features = getTracker('zd_features', []);
   if (!features.includes(name)) {
     features.push(name);
@@ -120,13 +123,52 @@ function setWebsiteTheme(theme) {
 
 function toggleNotify(on) {
   localStorage.setItem('zd_notify', String(on));
+  // Sync both toggles
+  document.querySelectorAll('#dashNotifyToggle, #settingsNotifyToggle').forEach(cb => {
+    if (cb) cb.checked = on;
+  });
 }
 
 (function loadNotify() {
   const on = localStorage.getItem('zd_notify') !== 'false';
-  const cb = document.getElementById('dashNotifyToggle');
-  if (cb) cb.checked = on;
+  document.querySelectorAll('#dashNotifyToggle, #settingsNotifyToggle').forEach(cb => {
+    if (cb) cb.checked = on;
+  });
 })();
+
+let trackingEnabled = true;
+
+function toggleTracking(on) {
+  trackingEnabled = on;
+  localStorage.setItem('zd_tracking', String(on));
+  document.querySelectorAll('#settingsTrackingToggle').forEach(cb => {
+    if (cb) cb.checked = on;
+  });
+}
+
+(function loadTracking() {
+  const stored = localStorage.getItem('zd_tracking');
+  trackingEnabled = stored !== 'false';
+  document.querySelectorAll('#settingsTrackingToggle').forEach(cb => {
+    if (cb) cb.checked = trackingEnabled;
+  });
+})();
+
+function clearAllData() {
+  if (!confirm('This will clear all local data including settings, usage tracking, and GitHub authentication. Are you sure?')) return;
+  localStorage.removeItem('zd_visits');
+  localStorage.removeItem('zd_downloads');
+  localStorage.removeItem('zd_features');
+  localStorage.removeItem('zd_firstVisit');
+  localStorage.removeItem('zd_activity');
+  localStorage.removeItem('zd_theme');
+  localStorage.removeItem('zd_notify');
+  localStorage.removeItem('zd_tracking');
+  localStorage.removeItem(GH_KEY);
+  localStorage.removeItem(GH_USER_KEY);
+  // Reload page to reset everything
+  window.location.reload();
+}
 
 // ===== GITHUB OAUTH DEVICE FLOW =====
 const GH_KEY = 'zd_gh_token';

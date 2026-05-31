@@ -7,6 +7,7 @@ module.exports = async (req, res) => {
 
   const { action } = req.query;
   const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   if (action === 'device-code') {
     if (!clientId) return res.status(500).json({ error: 'GITHUB_CLIENT_ID not configured' });
@@ -25,7 +26,7 @@ module.exports = async (req, res) => {
     const r = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ client_id: clientId, device_code, grant_type: 'urn:ietf:params:oauth:grant-type:device_code' }),
+      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, device_code, grant_type: 'urn:ietf:params:oauth:grant-type:device_code' }),
     });
     const data = await r.json();
     return res.status(r.status).json(data);

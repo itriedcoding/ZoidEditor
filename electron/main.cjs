@@ -473,7 +473,7 @@ ipcMain.handle('github:requestDeviceCode', async () => {
   const res = await httpFetch('https://github.com/login/device/code', {
     method: 'POST',
     body: JSON.stringify({
-      client_id: 'Ov23li4uuzt8vrecmH5k',
+      client_id: 'Ov23liVYPrguj0xcMXc6',
       scope: 'repo,user,read:org',
     }),
   });
@@ -491,7 +491,7 @@ ipcMain.handle('github:pollForToken', async (_, deviceCode, interval, expiresIn)
     const res = await httpFetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       body: JSON.stringify({
-        client_id: 'Ov23li4uuzt8vrecmH5k',
+        client_id: 'Ov23liVYPrguj0xcMXc6',
         device_code: deviceCode,
         grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
       }),
