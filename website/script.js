@@ -123,17 +123,14 @@ function setWebsiteTheme(theme) {
 
 function toggleNotify(on) {
   localStorage.setItem('zd_notify', String(on));
-  // Sync both toggles
-  document.querySelectorAll('#dashNotifyToggle, #settingsNotifyToggle').forEach(cb => {
-    if (cb) cb.checked = on;
-  });
+  const cb = document.getElementById('dashNotifyToggle');
+  if (cb) cb.checked = on;
 }
 
 (function loadNotify() {
   const on = localStorage.getItem('zd_notify') !== 'false';
-  document.querySelectorAll('#dashNotifyToggle, #settingsNotifyToggle').forEach(cb => {
-    if (cb) cb.checked = on;
-  });
+  const cb = document.getElementById('dashNotifyToggle');
+  if (cb) cb.checked = on;
 })();
 
 let trackingEnabled = true;
@@ -141,17 +138,15 @@ let trackingEnabled = true;
 function toggleTracking(on) {
   trackingEnabled = on;
   localStorage.setItem('zd_tracking', String(on));
-  document.querySelectorAll('#settingsTrackingToggle').forEach(cb => {
-    if (cb) cb.checked = on;
-  });
+  const cb = document.getElementById('dashTrackingToggle');
+  if (cb) cb.checked = on;
 }
 
 (function loadTracking() {
   const stored = localStorage.getItem('zd_tracking');
   trackingEnabled = stored !== 'false';
-  document.querySelectorAll('#settingsTrackingToggle').forEach(cb => {
-    if (cb) cb.checked = trackingEnabled;
-  });
+  const cb = document.getElementById('dashTrackingToggle');
+  if (cb) cb.checked = trackingEnabled;
 })();
 
 function clearAllData() {
@@ -251,8 +246,9 @@ function updateDashboard() {
       }).join('');
     }
 
-    // Reload theme & notify
+    // Reload settings toggles
     loadNotify();
+    loadTracking();
   } else {
     personal.style.display = 'none';
     subtitle.textContent = 'Sign in with GitHub to access your personal dashboard.';

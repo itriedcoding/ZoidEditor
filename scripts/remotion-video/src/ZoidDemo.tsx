@@ -3,7 +3,7 @@ import { useCurrentFrame, interpolate, Sequence, AbsoluteFill, Img, staticFile, 
 
 const SCENES = [
   { img: 'editor-welcome.png', title: 'Monaco Editor', desc: 'Full IntelliSense, multi-cursor, code folding' },
-  { img: 'editor-terminal.png', title: 'Real Terminal', desc: 'xterm.js integrated with your system shell' },
+  { img: 'editor-terminal.png', title: 'Native Terminal', desc: 'One-click launch of your system terminal' },
   { img: 'editor-ai.png', title: 'AI-Powered Coding', desc: 'Chat with multiple AI models at once' },
   { img: 'editor-extensions.png', title: 'VS Code Extensions', desc: 'Browse & install from Open VSX registry' },
   { img: 'editor-git.png', title: 'Git Integration', desc: 'Stage, commit, branch, push, pull — fully built-in' },
