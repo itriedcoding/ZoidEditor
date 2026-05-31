@@ -75,19 +75,7 @@ function createWindow() {
     } catch {}
   });
 
-  // Screenshot mode: capture page content and exit
-  if (process.env.ZOID_SCREENSHOT_MODE) {
-    mainWindow.webContents.on('did-finish-load', async () => {
-      // Wait for rendering to settle
-      await new Promise(r => setTimeout(r, 3000));
-      const image = await mainWindow.webContents.capturePage();
-      const png = image.toPNG();
-      const outFile = process.env.ZOID_SCREENSHOT_OUT || path.join(__dirname, '..', 'public', 'screenshot.png');
-      fs.writeFileSync(outFile, png);
-      console.log('Screenshot saved:', outFile, `(${png.length} bytes)`);
-      app.quit();
-    });
-  }
+
 
   // Save window state
   const saveWindowState = () => {
