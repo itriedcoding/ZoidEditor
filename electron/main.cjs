@@ -799,131 +799,116 @@ ipcMain.handle('git:close', async () => {
   return { success: true };
 });
 
-// ========== REAL TERMINAL ==========
-let shellProcess = null;
-let shellProcessInfo = { shell: '', name: '' };
-
-function detectShell() {
+// ========== NATIVE TERMINAL LAUNCHER ==========
+function detectNativeTerminal() {
   const isWin = process.platform === 'win32';
   const isMac = process.platform === 'darwin';
 
+  // Also detect which shell runs INSIDE the terminal
+  function detectShell() {
+    if (isWin) {
+      try {
+        const pwsh = require('child_process').execSync('where pwsh.exe 2>nul', { encoding: 'utf-8' }).trim().split('\n')[0];
+        if (pwsh) return { path: pwsh, name: 'pwsh' };
+      } catch {}
+      const ps = path.join(process.env.WINDIR || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+      if (fs.existsSync(ps)) return { path: ps, name: 'powershell' };
+      return { path: process.env.COMSPEC || 'cmd.exe', name: 'cmd' };
+    }
+    if (isMac) {
+      const sh = process.env.SHELL || '';
+      if (sh) return { path: sh, name: path.basename(sh) };
+      if (fs.existsSync('/bin/zsh')) return { path: '/bin/zsh', name: 'zsh' };
+      return { path: '/bin/bash', name: 'bash' };
+    }
+    const sh = process.env.SHELL || '';
+    if (sh) return { path: sh, name: path.basename(sh) };
+    if (fs.existsSync('/bin/bash')) return { path: '/bin/bash', name: 'bash' };
+    return { path: '/bin/sh', name: 'sh' };
+  }
+
+  const shell = detectShell();
+
   if (isWin) {
-    // Windows: pwsh (PowerShell Core) > powershell.exe > cmd.exe
-    try {
-      const pwshPath = require('child_process').execSync('where pwsh.exe 2>nul', { encoding: 'utf-8' }).trim().split('\n')[0];
-      if (pwshPath) return { shell: pwshPath, name: 'pwsh' };
-    } catch {}
-    const psPath = path.join(process.env.WINDIR || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
-    if (fs.existsSync(psPath)) return { shell: psPath, name: 'powershell' };
-    return { shell: process.env.COMSPEC || 'cmd.exe', name: 'cmd' };
+    // Windows: prefer Windows Terminal, then fallback to shell directly
+    const wt = path.join(process.env.LOCALAPPDATA || '', 'Microsoft', 'WindowsApps', 'wt.exe');
+    if (fs.existsSync(wt)) {
+      return { terminal: wt, terminalName: 'Windows Terminal', shell: shell.path, shellName: shell.name, args: ['-d', '.'], launchCmd: null };
+    }
+    // No Windows Terminal — just launch the shell directly (it opens its own window)
+    return { terminal: shell.path, terminalName: shell.name, shell: shell.path, shellName: shell.name, args: [], launchCmd: null };
   }
 
   if (isMac) {
-    // macOS: respect SHELL env, fallback to zsh (default since Catalina)
-    const sh = process.env.SHELL || '';
-    if (sh) return { shell: sh, name: path.basename(sh) };
-    if (fs.existsSync('/bin/zsh')) return { shell: '/bin/zsh', name: 'zsh' };
-    return { shell: '/bin/bash', name: 'bash' };
-  }
-
-  // Linux: respect SHELL env, fallback to bash then sh
-  const sh = process.env.SHELL || '';
-  if (sh) return { shell: sh, name: path.basename(sh) };
-  if (fs.existsSync('/bin/bash')) return { shell: '/bin/bash', name: 'bash' };
-  return { shell: '/bin/sh', name: 'sh' };
-}
-
-function startShell(win, cols, rows) {
-  return new Promise((resolve, reject) => {
-    const { shell, name } = detectShell();
-    shellProcessInfo = { shell, name };
-    const isWin = process.platform === 'win32';
-    const args = isWin ? [] : ['--login'];
-
-    try {
-      const { spawn } = require('child_process');
-      shellProcess = spawn(shell, args, {
-        stdio: ['pipe', 'pipe', 'pipe'],
-        env: {
-          ...process.env,
-          TERM: 'xterm-256color',
-          COLUMNS: String(cols || 80),
-          LINES: String(rows || 24),
-        },
-        windowsHide: false,
-      });
-
-      // Send shell name to renderer
-      if (win && !win.isDestroyed()) {
-        win.webContents.send('terminal:shell', name);
+    // macOS: prefer iTerm2 or Warp, fallback to Terminal.app
+    const terminals = [
+      { path: '/Applications/Warp.app', name: 'Warp' },
+      { path: '/Applications/iTerm.app', name: 'iTerm2' },
+    ];
+    for (const t of terminals) {
+      if (fs.existsSync(t.path)) {
+        return { terminal: t.path, terminalName: t.name, shell: shell.path, shellName: shell.name, args: [], launchCmd: 'open' };
       }
-
-      shellProcess.stdout.on('data', (data) => {
-        if (win && !win.isDestroyed()) {
-          win.webContents.send('terminal:data', data.toString('base64'));
-        }
-      });
-
-      shellProcess.stderr.on('data', (data) => {
-        if (win && !win.isDestroyed()) {
-          win.webContents.send('terminal:data', data.toString('base64'));
-        }
-      });
-
-      shellProcess.on('exit', () => {
-        shellProcess = null;
-        if (win && !win.isDestroyed()) {
-          win.webContents.send('terminal:exit');
-        }
-      });
-
-      shellProcess.on('error', (err) => {
-        shellProcess = null;
-        reject(err);
-      });
-
-      resolve(true);
-    } catch (err) {
-      reject(err);
     }
-  });
+    // Default Terminal.app (always present)
+    return { terminal: '/System/Applications/Utilities/Terminal.app', terminalName: 'Terminal', shell: shell.path, shellName: shell.name, args: [], launchCmd: 'open' };
+  }
+
+  // Linux: check $TERMINAL env, then common terminals
+  const termEnv = process.env.TERMINAL;
+  if (termEnv) {
+    return { terminal: termEnv, terminalName: path.basename(termEnv), shell: shell.path, shellName: shell.name, args: [], launchCmd: null };
+  }
+  const linuxTerms = ['gnome-terminal', 'konsole', 'xfce4-terminal', 'lxterminal', 'xterm', 'urxvt'];
+  for (const t of linuxTerms) {
+    try {
+      require('child_process').execSync(`which ${t} 2>/dev/null`, { encoding: 'utf-8' });
+      return { terminal: t, terminalName: t, shell: shell.path, shellName: shell.name, args: [], launchCmd: null };
+    } catch {}
+  }
+  return { terminal: 'xterm', terminalName: 'xterm', shell: shell.path, shellName: shell.name, args: [], launchCmd: null };
 }
 
-ipcMain.handle('terminal:start', async (_, cols, rows) => {
-  if (shellProcess) {
-    shellProcess.kill();
-    shellProcess = null;
-  }
-  await startShell(mainWindow, cols || 80, rows || 24);
-  return { name: shellProcessInfo.name };
+ipcMain.handle('terminal:detect', () => {
+  return detectNativeTerminal();
 });
 
-ipcMain.handle('terminal:stdin', (_, data) => {
-  if (shellProcess && shellProcess.stdin.writable) {
-    shellProcess.stdin.write(data);
-  }
-});
+ipcMain.handle('terminal:open', async (_, cwd) => {
+  const info = detectNativeTerminal();
+  const isWin = process.platform === 'win32';
+  const isMac = process.platform === 'darwin';
 
-ipcMain.handle('terminal:resize', (_, cols, rows) => {
-  if (shellProcess) {
-    if (process.platform !== 'win32') {
-      try { process.kill(shellProcess.pid, 'SIGWINCH'); } catch {}
-    }
-    if (shellProcess.stdout) {
-      try { shellProcess.stdout.columns = cols; } catch {}
-      try { shellProcess.stdout.rows = rows; } catch {}
-    }
-    if (shellProcess.stderr) {
-      try { shellProcess.stderr.columns = cols; } catch {}
-      try { shellProcess.stderr.rows = rows; } catch {}
-    }
-  }
-});
+  try {
+    const { spawn } = require('child_process');
 
-ipcMain.handle('terminal:kill', () => {
-  if (shellProcess) {
-    shellProcess.kill();
-    shellProcess = null;
+    if (isWin) {
+      if (info.terminalName === 'Windows Terminal') {
+        spawn('wt.exe', ['-d', cwd || '.'], {
+          detached: true, stdio: 'ignore', windowsHide: false,
+        });
+      } else if (info.shellName === 'pwsh' || info.shellName === 'powershell') {
+        spawn('powershell.exe', ['-NoExit', '-Command', `Set-Location '${cwd || '.'}'`], {
+          detached: true, stdio: 'ignore', windowsHide: false,
+        });
+      } else {
+        spawn('cmd.exe', ['/K', `cd /d "${cwd || '.'}"`], {
+          detached: true, stdio: 'ignore', windowsHide: false,
+        });
+      }
+    } else if (isMac) {
+      // Terminal.app doesn't support --working-directory easily
+      // Use AppleScript or just open the app
+      spawn('open', ['-a', info.terminal], { detached: true, stdio: 'ignore' });
+    } else {
+      // Linux: gnome-terminal supports --working-directory
+      spawn(info.terminal, [...info.args, cwd ? `--working-directory=${cwd}` : ''].filter(Boolean), {
+        detached: true, stdio: 'ignore',
+      });
+    }
+
+    return { success: true, terminalName: info.terminalName, shellName: info.shellName };
+  } catch (err) {
+    return { success: false, error: err.message };
   }
 });
 

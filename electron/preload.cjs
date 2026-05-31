@@ -28,27 +28,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
     capturePage: () => ipcRenderer.invoke('app:capturePage'),
   },
-  // ========== REAL TERMINAL ==========
+  // ========== NATIVE TERMINAL LAUNCHER ==========
   terminal: {
-    start: () => ipcRenderer.invoke('terminal:start'),
-    write: (data) => ipcRenderer.invoke('terminal:stdin', data),
-    resize: (cols, rows) => ipcRenderer.invoke('terminal:resize', cols, rows),
-    kill: () => ipcRenderer.invoke('terminal:kill'),
-    onData: (callback) => {
-      const handler = (_, data) => callback(data);
-      ipcRenderer.on('terminal:data', handler);
-      return () => ipcRenderer.removeListener('terminal:data', handler);
-    },
-    onExit: (callback) => {
-      const handler = () => callback();
-      ipcRenderer.on('terminal:exit', handler);
-      return () => ipcRenderer.removeListener('terminal:exit', handler);
-    },
-    onShell: (callback) => {
-      const handler = (_, name) => callback(name);
-      ipcRenderer.on('terminal:shell', handler);
-      return () => ipcRenderer.removeListener('terminal:shell', handler);
-    },
+    detect: () => ipcRenderer.invoke('terminal:detect'),
+    open: (cwd) => ipcRenderer.invoke('terminal:open', cwd),
   },
   // ========== GITHUB AUTH (via main process) ==========
   github: {

@@ -258,13 +258,25 @@ body { font-family: var(--font-sans); background: var(--bg-primary); color: var(
 .terminal-panel { height: 100%; display: flex; flex-direction: column; background: #0c0c0c; }
 .terminal-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 12px; background: #0a0a0a; font-size: 11px; font-weight: 600; color: #888; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
 .terminal-header-left { display: flex; align-items: center; gap: 6px; }
-.terminal-header-center { display: flex; align-items: center; }
-.terminal-shell-name { font-size: 10px; color: #666; font-family: var(--font-mono); }
-.terminal-header-right { display: flex; gap: 2px; }
-.term-btn { background: none; border: none; color: #666; cursor: pointer; padding: 2px 6px; border-radius: 3px; display: flex; align-items: center; }
-.term-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
-.terminal-xterm { flex: 1; }
-.terminal-xterm .xterm { height: 100%; padding: 4px; }
+.terminal-native-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; gap: 12px;
+}
+.terminal-native-icon { color: rgba(255,255,255,0.15); margin-bottom: 4px; }
+.terminal-native-detail { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.terminal-native-label { color: rgba(255,255,255,0.3); font-weight: 500; }
+.terminal-native-value { color: rgba(255,255,255,0.7); font-family: var(--font-mono); }
+.terminal-native-btn {
+  margin-top: 8px; padding: 10px 32px; border: none; border-radius: 6px;
+  background: rgba(255,255,255,0.08); color: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: background 0.25s;
+}
+.terminal-native-btn:hover { background: rgba(255,255,255,0.14); }
+.terminal-native-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.terminal-native-error { font-size: 11px; color: #e06c75; text-align: center; max-width: 280px; }
+.terminal-native-hint { font-size: 11px; color: rgba(255,255,255,0.2); text-align: center; max-width: 280px; line-height: 1.5; }
 
 /* STATUS BAR */
 .statusbar { display: flex; align-items: center; justify-content: space-between; height: var(--statusbar-height); padding: 0 12px; background: var(--bg-primary); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; }

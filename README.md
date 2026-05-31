@@ -10,7 +10,7 @@ A free, open-source code editor with native AI integration, MCP server support, 
 - **44+ AI Models** — BYOK for OpenAI (GPT-4o, GPT-4.1, o4), Anthropic (Claude Sonnet 4, Opus 4), Google (Gemini 2.5 Pro/Flash), Groq (Llama 3.3, DeepSeek R1), and OpenRouter. Free models and local Ollama/LM Studio auto-detection
 - **MCP Server Support** — Connect AI to external tools via the Model Context Protocol. Manage filesystem, database, or custom MCP servers directly from the editor
 - **Snippet Manager** — Save and organize reusable code snippets. Insert them into your editor with one click
-- **Real Terminal** — Integrated xterm.js terminal connected to your system shell (auto-detects pwsh, PowerShell, zsh, bash across all platforms)
+- **Native Terminal** — Opens your system's native terminal (Windows Terminal / cmd / PowerShell, macOS Terminal / iTerm2 / Warp, Linux gnome-terminal / xterm) with one click. Auto-detects your shell (pwsh, zsh, bash) and terminal app
 - **VS Code Extensions** — Browse and install extensions from the Open VSX registry directly within the editor
 - **Git Integration** — Full Git workflow: stage, commit, branch, checkout, push, pull, diff — all from the built-in source control panel
 - **Glassmorphism UI** — Black & white glassmorphism design with dark/light mode toggle, custom title bar, and smooth animations
@@ -58,7 +58,7 @@ npm run electron:build:linux    # Build Linux .AppImage + .deb (requires Linux)
 | Editor | Monaco Editor |
 | Frontend | React 18, TypeScript, Vite |
 | Desktop | Electron 31 |
-| Terminal | xterm.js + xterm-addon-fit |
+| Terminal | Native OS terminal launcher |
 | Styling | Glassmorphism CSS (custom) |
 | AI SDK | OpenAI, Anthropic, Google, Groq APIs |
 | Git | simple-git |
