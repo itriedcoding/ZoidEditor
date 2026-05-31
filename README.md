@@ -1,8 +1,6 @@
-<img width="1742" height="1012" alt="Screenshot 2026-05-31 073900" src="https://github.com/user-attachments/assets/e461a09a-db34-41c3-80e8-cf62d0e56179" /># Zoid Editor
-
 A free, open-source code editor with native AI integration, VS Code extension support, real Git workflows, and a glassmorphism interface — built with Electron, React, and Monaco Editor.
 
-![Zoid Editor](Uploading Screenshot 2026-05-31 073900.png…)
+<img width="1742" height="1012" alt="Screenshot 2026-05-31 073900" src="https://github.com/user-attachments/assets/e461a09a-db34-41c3-80e8-cf62d0e56179" /># Zoid Editor
 
 ## Features
 
@@ -80,7 +78,7 @@ ZoidEditor/
 
 ## Screenshots
 
-![Zoid Editor screenshot](website/screenshot.png)
+<img width="1742" height="1012" alt="Screenshot 2026-05-31 073900" src="https://github.com/user-attachments/assets/e461a09a-db34-41c3-80e8-cf62d0e56179" /># Zoid Editor
 
 *Zoid Editor with the glassmorphism dark theme, file tree sidebar, and integrated terminal.*
 
