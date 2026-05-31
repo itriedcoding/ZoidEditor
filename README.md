@@ -2,7 +2,7 @@
 
 A free, open-source code editor with native AI integration, VS Code extension support, real Git workflows, and a glassmorphism interface — built with Electron, React, and Monaco Editor.
 
-![Zoid Editor screenshot](public/screenshot.png)
+![Zoid Editor demo](public/demo.mp4)
 
 ## Features
 
