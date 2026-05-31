@@ -28,6 +28,11 @@
         <a href="#showcase">Showcase</a>
         <a href="#download">Download</a>
         <a href="https://github.com/itriedcoding/ZoidEditor" target="_blank" rel="noopener">GitHub</a>
+        <a href="#dashboard">Dashboard</a>
+        <button class="nav-gh-btn" id="navGhBtn" aria-label="Sign in with GitHub" onclick="startGitHubAuth()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span id="navGhLabel">Sign in</span>
+        </button>
         <a href="#download" class="nav-download-btn glossy-btn">Download</a>
       </div>
       <button class="nav-mobile-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
@@ -136,6 +141,51 @@
         </div>
         <video src="demo.mp4" alt="Zoid Editor demo video" class="showcase-img" autoplay muted loop playsinline loading="lazy"></video>
       </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="dashboard" id="dashboard">
+    <div class="section-header reveal">
+      <h2>Dashboard</h2>
+      <p>Live project stats and community activity.</p>
+    </div>
+    <div class="dashboard-grid">
+      <div class="dash-card glass reveal" id="dashStars">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <span class="dash-num" id="dashStarsNum">--</span>
+        <span class="dash-label">GitHub Stars</span>
+      </div>
+      <div class="dash-card glass reveal" id="dashForks">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="3" ry="2.5"/><ellipse cx="6" cy="19" rx="3" ry="2.5"/><ellipse cx="18" cy="19" rx="3" ry="2.5"/><line x1="12" y1="7.5" x2="12" y2="12"/><line x1="8" y1="17" x2="6.5" y2="15"/><line x1="16" y1="17" x2="17.5" y2="15"/></svg></div>
+        <span class="dash-num" id="dashForksNum">--</span>
+        <span class="dash-label">Forks</span>
+      </div>
+      <div class="dash-card glass reveal" id="dashVersion">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="dash-num" id="dashVersionNum">--</span>
+        <span class="dash-label">Latest Version</span>
+      </div>
+      <div class="dash-card glass reveal" id="dashDownloads">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <span class="dash-num" id="dashDownloadsNum">--</span>
+        <span class="dash-label">Total Downloads</span>
+      </div>
+      <div class="dash-card glass reveal" id="dashVisits">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <span class="dash-num" id="dashVisitsNum">--</span>
+        <span class="dash-label">Site Visits</span>
+      </div>
+      <div class="dash-card glass reveal" id="dashOpenIssues">
+        <div class="dash-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <span class="dash-num" id="dashIssuesNum">--</span>
+        <span class="dash-label">Open Issues</span>
+      </div>
+    </div>
+    <div class="dash-user" id="dashUser" style="display:none">
+      <img id="dashUserAvatar" alt="" width="40" height="40">
+      <span id="dashUserName"></span>
+      <button class="btn-secondary" onclick="signOutGitHub()" style="padding:6px 18px;font-size:12px">Sign Out</button>
     </div>
   </section>
 
