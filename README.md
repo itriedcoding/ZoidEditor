@@ -46,21 +46,6 @@ npm run dev          # Development mode with hot reload
 npm run electron:pack   # Package for testing (unpacked)
 npm run electron:build  # Build installer (NSIS)
 ```
-
-### GitHub OAuth Setup
-
-**For the Editor (desktop app):**
-1. Go to https://github.com/settings/developers and create a new OAuth app
-2. Set the Homepage URL to `https://github.com`
-3. Set the Authorization callback URL to `https://github.com`
-4. Copy your Client ID
-5. Open `electron/main.cjs` and replace `Ov23li4uuzt8vrecmH5k` in both the `github:requestDeviceCode` and `github:pollForToken` handlers
-
-**For the Website (GitHub sign-in):**
-1. Go to https://vercel.com/your-team/zoid-editor/settings/environment-variables
-2. Add `GITHUB_CLIENT_ID` with your OAuth App's Client ID
-3. Redeploy the website
-
 ## Tech Stack
 
 | Layer | Technology |
