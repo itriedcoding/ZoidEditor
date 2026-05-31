@@ -9,9 +9,11 @@
     "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npx electron . --dev\"",
     "build": "vite build",
     "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npx electron . --dev\"",
-    "electron:build": "node scripts/generate-icon.cjs && vite build && electron-builder --win",
-    "electron:build:all": "node scripts/generate-icon.cjs && vite build && electron-builder",
+    "electron:build": "node scripts/generate-icon.cjs && vite build && electron-builder",
     "electron:build:win": "node scripts/generate-icon.cjs && vite build && electron-builder --win --x64",
+    "electron:build:mac": "node scripts/generate-icon.cjs && vite build && electron-builder --mac --x64 --arm64",
+    "electron:build:linux": "node scripts/generate-icon.cjs && vite build && electron-builder --linux --x64",
+    "electron:build:all": "node scripts/generate-icon.cjs && vite build && electron-builder --win --x64 --linux --x64 --mac --x64 --arm64",
     "electron:pack": "node scripts/generate-icon.cjs && vite build && electron-builder --win --x64 --dir",
     "electron:installer": "node scripts/generate-icon.cjs && electron-builder --win --x64 --prepackaged release\\win-unpacked",
     "electron:zip": "node scripts/package-zip.cjs",
@@ -248,15 +250,32 @@
       }
     ],
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.developer-tools"
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.developer-tools",
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "darkModeSupport": true
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
       ],
-      "category": "Development"
+      "category": "Development",
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-linux.${ext}",
+      "synopsis": "Advanced code editor with AI integration",
+      "maintainer": "Zoid Editor <dev@zoid-editor.app>",
+      "desktop": {
+        "Name": "Zoid Editor",
+        "Comment": "Code editor for vibe coders",
+        "Categories": "Development;IDE;TextEditor"
+      }
     }
   }
 }

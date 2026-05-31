@@ -6,9 +6,12 @@ const http = require('http');
 
 let mainWindow;
 let isQuitting = false;
+const platform = process.platform;
 
-// Windows app user model ID - required for proper taskbar grouping
-app.setAppUserModelId('com.zoid.editor');
+// Platform-specific app user model ID (Windows only)
+if (platform === 'win32') {
+  app.setAppUserModelId('com.zoid.editor');
+}
 
 // Prevent multiple instances
 const gotLock = app.requestSingleInstanceLock();
@@ -24,32 +27,47 @@ if (!gotLock) {
 }
 
 function createWindow() {
-  // Use native Windows title bar overlay for caption buttons
-  // This gives us Windows 11 snap layouts, taskbar integration, etc.
-  const useOverlay = process.platform === 'win32';
+  const isWin = platform === 'win32';
+  const isMac = platform === 'darwin';
+  const isLinux = platform === 'linux';
 
-  mainWindow = new BrowserWindow({
+  const windowOpts = {
     width: 1400,
     height: 900,
     minWidth: 800,
     minHeight: 500,
-    frame: !useOverlay,
-    titleBarStyle: useOverlay ? 'hidden' : 'default',
-    titleBarOverlay: useOverlay ? {
-      color: '#000000',
-      symbolColor: '#ffffff',
-      height: 40,
-    } : undefined,
     backgroundColor: '#000000',
     show: false,
-    icon: path.join(__dirname, '..', 'build', 'icon.ico'),
+    icon: path.join(__dirname, '..', 'build', isWin ? 'icon.ico' : 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
     },
-  });
+  };
+
+  if (isWin) {
+    // Windows: frameless with custom title bar overlay (Windows 11 snap layouts)
+    windowOpts.frame = false;
+    windowOpts.titleBarStyle = 'hidden';
+    windowOpts.titleBarOverlay = {
+      color: '#000000',
+      symbolColor: '#ffffff',
+      height: 40,
+    };
+  } else if (isMac) {
+    // macOS: use hiddenInset for native traffic lights + custom titlebar
+    windowOpts.frame = false;
+    windowOpts.titleBarStyle = 'hiddenInset';
+    windowOpts.trafficLightPosition = { x: 12, y: 12 };
+  } else {
+    // Linux: frameless with our own titlebar
+    windowOpts.frame = false;
+    windowOpts.titleBarStyle = 'hidden';
+  }
+
+  mainWindow = new BrowserWindow(windowOpts);
 
   // Load the app
   const isDev = process.env.VITE_DEV_SERVER_URL || process.argv.includes('--dev');
@@ -109,9 +127,33 @@ function createWindow() {
   });
 }
 
-// Native app menu for Windows
+// Cross-platform native app menu
 function createMenu() {
+  const isMac = process.platform === 'darwin';
+
   const template = [
+    // macOS app menu
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        {
+          label: 'Settings',
+          accelerator: 'Cmd+,',
+          click: () => mainWindow?.webContents.send('menu:settings'),
+        },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    }] : []),
+
     {
       label: 'File',
       submenu: [
@@ -142,7 +184,7 @@ function createMenu() {
           click: () => mainWindow?.webContents.send('menu:save-as'),
         },
         { type: 'separator' },
-        { role: 'quit', label: 'Exit' },
+        ...(isMac ? [{ role: 'close' }] : [{ role: 'quit', label: 'Exit' }]),
       ],
     },
     {
@@ -202,7 +244,7 @@ function createMenu() {
               type: 'info',
               title: 'About Zoid Editor',
               message: 'Zoid Editor v1.0.0',
-              detail: 'Advanced Code Editor for Vibe Coders\n\nBuilt with Electron, React, Monaco Editor\n\nAI-powered coding with BYOK, free models, and local models.',
+              detail: 'Advanced Code Editor for Vibe Coders\n\nBuilt with Electron, React, Monaco Editor\n\nAI-powered coding with BYOK, free models, local models, and MCP server support.',
             });
           },
         },
@@ -228,7 +270,10 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+  // On macOS, keep app running in dock even when all windows are closed
 });
 
 app.on('before-quit', () => {
