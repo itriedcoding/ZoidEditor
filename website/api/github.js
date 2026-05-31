@@ -23,10 +23,13 @@ module.exports = async (req, res) => {
   if (action === 'poll-token') {
     if (!clientId) return res.status(500).json({ error: 'GITHUB_CLIENT_ID not configured' });
     const { device_code } = req.body;
+    if (!device_code) return res.status(400).json({ error: 'Missing device_code' });
+    const tokenBody = { client_id: clientId, device_code, grant_type: 'urn:ietf:params:oauth:grant-type:device_code' };
+    if (clientSecret) tokenBody.client_secret = clientSecret;
     const r = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, device_code, grant_type: 'urn:ietf:params:oauth:grant-type:device_code' }),
+      body: JSON.stringify(tokenBody),
     });
     const data = await r.json();
     return res.status(r.status).json(data);

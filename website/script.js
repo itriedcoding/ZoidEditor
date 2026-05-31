@@ -271,10 +271,17 @@ async function startGitHubAuth() {
   try {
     const res = await fetch('/api/github?action=device-code', { method: 'POST' });
     const data = await res.json();
-    if (data.error) { alert('Failed to start GitHub auth: ' + data.error); return; }
+    if (data.error) {
+      alert('GitHub auth error: ' + (data.error_description || data.error));
+      return;
+    }
+    if (!data.device_code || !data.user_code) {
+      alert('GitHub returned an unexpected response. Make sure Device Flow is enabled on the OAuth App.');
+      return;
+    }
     showOAuthModal(data.user_code, data.verification_uri, data.device_code, data.interval || 5);
   } catch (err) {
-    alert('Failed to start GitHub authentication. Check that GITHUB_CLIENT_ID is configured on the server.');
+    alert('Could not reach the authentication server. Please try again.');
   }
 }
 
@@ -316,6 +323,12 @@ async function pollForToken(deviceCode, interval, overlay) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ device_code: deviceCode }),
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      statusEl.innerHTML = 'Server error (' + res.status + '). Retrying...';
+      pollTimer = setTimeout(() => pollForToken(deviceCode, interval, overlay), 5000);
+      return;
+    }
     const data = await res.json();
     if (data.access_token) {
       localStorage.setItem(GH_KEY, data.access_token);
@@ -326,12 +339,12 @@ async function pollForToken(deviceCode, interval, overlay) {
     }
     if (data.error === 'authorization_pending') {}
     else if (data.error === 'slow_down') { interval += 5; }
-    else if (data.error === 'expired_token') { statusEl.innerHTML = 'Code expired. Please try again.'; return; }
-    else if (data.error === 'access_denied') { statusEl.innerHTML = 'Authorization denied.'; return; }
-    else if (data.error) { statusEl.innerHTML = 'Error: ' + (data.error_description || data.error); return; }
+    else if (data.error === 'expired_token') { statusEl.innerHTML = 'Code expired. Please try again.'; overlay.querySelector('.oauth-close')?.click(); return; }
+    else if (data.error === 'access_denied') { statusEl.innerHTML = 'Authorization denied.'; overlay.querySelector('.oauth-close')?.click(); return; }
+    else if (data.error) { statusEl.innerHTML = 'GitHub error: ' + (data.error_description || data.error); return; }
     pollTimer = setTimeout(() => pollForToken(deviceCode, interval, overlay), interval * 1000);
-  } catch {
-    statusEl.innerHTML = 'Connection error. Retrying...';
+  } catch (err) {
+    statusEl.innerHTML = 'Connection error. Retrying in 5s...';
     pollTimer = setTimeout(() => pollForToken(deviceCode, interval, overlay), 5000);
   }
 }
