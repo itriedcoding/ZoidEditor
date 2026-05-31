@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoid Editor — The Code Editor for Vibe Coders</title>
+  <meta name="description" content="Zoid Editor is a free, open-source code editor with AI integration, VS Code extensions, and a beautiful glassmorphism design.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='6' fill='%23000'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-size='18' font-weight='bold' font-family='sans-serif'%3EZ%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="noise"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5"/>
+          <text x="14" y="19" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold" font-family="sans-serif">Z</text>
+        </svg>
+        <span>Zoid Editor</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#showcase">Showcase</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/anomalyco/ZoidEditor" target="_blank" rel="noopener">GitHub</a>
+        <a href="#download" class="nav-download-btn glossy-btn">Download</a>
+      </div>
+      <button class="nav-mobile-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-badge">v1.0.0 &mdash; Open Source</span>
+      <h1 class="hero-title">
+        Code Editor<br>
+        <span class="gradient-text">for Vibe Coders</span>
+      </h1>
+      <p class="hero-subtitle">
+        A free, open-source code editor with native AI integration, VS Code extension support,<br class="hide-mobile">
+        real Git workflows, and a gorgeous glassmorphism interface.
+      </p>
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary glossy-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-right:8px"><path d="M8 1v10M4 7l4 4 4-4M2 13h12"/></svg>
+          Download Free
+        </a>
+        <a href="#features" class="btn-secondary">Learn More</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num">100%</span><span class="stat-label">Free &amp; Open Source</span></div>
+        <div class="stat-item"><span class="stat-num">Zero</span><span class="stat-label">Trackers or Telemetry</span></div>
+        <div class="stat-item"><span class="stat-num">BYOK</span><span class="stat-label">Bring Your Own AI Key</span></div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="13" height="21" rx="6.5"/><circle cx="8" cy="8" r="2" fill="currentColor" class="scroll-dot"/></svg>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-header reveal">
+      <h2>Everything You Need</h2>
+      <p>Built from the ground up for modern development workflows.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/></svg>
+        </div>
+        <h3>Monaco Editor</h3>
+        <p>Syntax highlighting, IntelliSense, multi-cursor editing, and code folding for every language.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>Real Terminal</h3>
+        <p>Integrated xterm.js terminal connected to your system shell with full color and Unicode support.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>AI-Powered</h3>
+        <p>Chat with multiple AI models simultaneously. Bring your own key or use free OpenRouter models.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+        </div>
+        <h3>VS Code Extensions</h3>
+        <p>Browse and install extensions from the Open VSX registry directly within the editor.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <h3>Git Integration</h3>
+        <p>Full Git workflow: stage, commit, branch, push, pull &mdash; all from the built-in source control panel.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Glassmorphism UI</h3>
+        <p>Stunning black &amp; white glassmorphism design with dark/light mode and smooth animations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE -->
+  <section class="showcase" id="showcase">
+    <div class="section-header reveal">
+      <h2>See It in Action</h2>
+      <p>A clean, distraction-free coding environment.</p>
+    </div>
+    <div class="showcase-image-wrap reveal">
+      <div class="showcase-frame">
+        <div class="showcase-dots">
+          <span></span><span></span><span></span>
+          <span class="showcase-dots-title">Zoid Editor</span>
+        </div>
+        <img src="screenshot.png" alt="Zoid Editor screenshot" class="showcase-img" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="download" id="download">
+    <div class="section-header reveal">
+      <h2>Download Zoid Editor</h2>
+      <p>Available for Windows. More platforms coming soon.</p>
+    </div>
+    <div class="download-cards">
+      <div class="download-card glass reveal">
+        <div class="download-os-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>Windows</h3>
+        <p>Windows 10 / 11 &mdash; 64-bit</p>
+        <div class="download-btns">
+          <a href="https://github.com/anomalyco/ZoidEditor/releases/download/v1.0.0/Zoid.Editor-Setup-1.0.0.exe" class="btn-primary glossy-btn" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-right:8px"><path d="M8 1v10M4 7l4 4 4-4M2 13h12"/></svg>
+            Download .exe
+          </a>
+        </div>
+        <p class="download-ver">Installer &bull; 106 MB</p>
+      </div>
+      <div class="download-card glass coming-soon reveal">
+        <div class="download-os-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>macOS</h3>
+        <p>Apple Silicon &amp; Intel</p>
+        <div class="download-btns">
+          <span class="btn-secondary disabled">Coming Soon</span>
+        </div>
+      </div>
+      <div class="download-card glass coming-soon reveal">
+        <div class="download-os-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M8 1v3M16 1v3M4 11h16"/></svg>
+        </div>
+        <h3>Linux</h3>
+        <p>.deb &amp; .AppImage</p>
+        <div class="download-btns">
+          <span class="btn-secondary disabled">Coming Soon</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5"/>
+          <text x="14" y="19" text-anchor="middle" fill="currentColor" font-size="14" font-weight="bold" font-family="sans-serif">Z</text>
+        </svg>
+        <span>Zoid Editor</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/anomalyco/ZoidEditor" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/anomalyco/ZoidEditor/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/anomalyco/ZoidEditor/releases" target="_blank" rel="noopener">Releases</a>
+      </div>
+      <p class="footer-copy">Zoid Editor is open source software. Not affiliated with Microsoft or VS Code.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

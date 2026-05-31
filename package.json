@@ -1,0 +1,260 @@
+{
+  "name": "zoid-editor",
+  "version": "1.0.0",
+  "description": "Advanced Code Editor for Vibe Coders - AI-powered coding with BYOK, free models, and local models",
+  "main": "electron/main.cjs",
+  "author": "Zoid Editor",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npx electron . --dev\"",
+    "build": "vite build",
+    "electron:dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && npx electron . --dev\"",
+    "electron:build": "node scripts/generate-icon.cjs && vite build && electron-builder --win",
+    "electron:build:all": "node scripts/generate-icon.cjs && vite build && electron-builder",
+    "electron:build:win": "node scripts/generate-icon.cjs && vite build && electron-builder --win --x64",
+    "electron:pack": "node scripts/generate-icon.cjs && vite build && electron-builder --win --x64 --dir",
+    "electron:installer": "node scripts/generate-icon.cjs && electron-builder --win --x64 --prepackaged release\\win-unpacked",
+    "electron:zip": "node scripts/package-zip.cjs",
+    "preview": "vite build && electron .",
+    "postinstall": "node scripts/generate-icon.cjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@google/generative-ai": "^0.21.0",
+    "@monaco-editor/react": "^4.6.0",
+    "monaco-editor": "^0.50.0",
+    "openai": "^4.70.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "screenshot-desktop": "^1.15.4",
+    "simple-git": "^3.36.0",
+    "uuid": "^10.0.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^8.2.2",
+    "electron": "^31.6.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.zoid.editor",
+    "productName": "Zoid Editor",
+    "copyright": "Copyright © 2026 Zoid Editor",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "build/**/*"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "extraResources": [],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Zoid Editor",
+      "displayLanguageSelector": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "runAfterFinish": true,
+      "warningsAsErrors": false
+    },
+    "fileAssociations": [
+      {
+        "ext": "js",
+        "name": "JavaScript",
+        "description": "JavaScript file",
+        "mimeType": "text/javascript"
+      },
+      {
+        "ext": "jsx",
+        "name": "JSX",
+        "description": "React JSX file",
+        "mimeType": "text/javascript"
+      },
+      {
+        "ext": "ts",
+        "name": "TypeScript",
+        "description": "TypeScript file",
+        "mimeType": "text/typescript"
+      },
+      {
+        "ext": "tsx",
+        "name": "TSX",
+        "description": "React TSX file",
+        "mimeType": "text/typescript"
+      },
+      {
+        "ext": "py",
+        "name": "Python",
+        "description": "Python source file",
+        "mimeType": "text/x-python"
+      },
+      {
+        "ext": "html",
+        "name": "HTML",
+        "description": "HTML file",
+        "mimeType": "text/html"
+      },
+      {
+        "ext": "css",
+        "name": "CSS",
+        "description": "CSS stylesheet",
+        "mimeType": "text/css"
+      },
+      {
+        "ext": "json",
+        "name": "JSON",
+        "description": "JSON file",
+        "mimeType": "application/json"
+      },
+      {
+        "ext": "md",
+        "name": "Markdown",
+        "description": "Markdown file",
+        "mimeType": "text/markdown"
+      },
+      {
+        "ext": "cpp",
+        "name": "C++",
+        "description": "C++ source file",
+        "mimeType": "text/x-c++"
+      },
+      {
+        "ext": "c",
+        "name": "C",
+        "description": "C source file",
+        "mimeType": "text/x-c"
+      },
+      {
+        "ext": "java",
+        "name": "Java",
+        "description": "Java source file",
+        "mimeType": "text/x-java"
+      },
+      {
+        "ext": "go",
+        "name": "Go",
+        "description": "Go source file",
+        "mimeType": "text/x-go"
+      },
+      {
+        "ext": "rs",
+        "name": "Rust",
+        "description": "Rust source file",
+        "mimeType": "text/x-rust"
+      },
+      {
+        "ext": "rb",
+        "name": "Ruby",
+        "description": "Ruby source file",
+        "mimeType": "text/x-ruby"
+      },
+      {
+        "ext": "php",
+        "name": "PHP",
+        "description": "PHP source file",
+        "mimeType": "text/x-php"
+      },
+      {
+        "ext": "swift",
+        "name": "Swift",
+        "description": "Swift source file",
+        "mimeType": "text/x-swift"
+      },
+      {
+        "ext": "kt",
+        "name": "Kotlin",
+        "description": "Kotlin source file",
+        "mimeType": "text/x-kotlin"
+      },
+      {
+        "ext": "yaml",
+        "name": "YAML",
+        "description": "YAML file",
+        "mimeType": "text/x-yaml"
+      },
+      {
+        "ext": "yml",
+        "name": "YAML",
+        "description": "YAML file",
+        "mimeType": "text/x-yaml"
+      },
+      {
+        "ext": "sh",
+        "name": "Shell Script",
+        "description": "Shell script",
+        "mimeType": "text/x-sh"
+      },
+      {
+        "ext": "sql",
+        "name": "SQL",
+        "description": "SQL file",
+        "mimeType": "text/x-sql"
+      },
+      {
+        "ext": "xml",
+        "name": "XML",
+        "description": "XML file",
+        "mimeType": "text/xml"
+      },
+      {
+        "ext": "toml",
+        "name": "TOML",
+        "description": "TOML config file",
+        "mimeType": "text/x-toml"
+      },
+      {
+        "ext": "vue",
+        "name": "Vue",
+        "description": "Vue component",
+        "mimeType": "text/x-vue"
+      },
+      {
+        "ext": "svelte",
+        "name": "Svelte",
+        "description": "Svelte component",
+        "mimeType": "text/x-svelte"
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development"
+    }
+  }
+}

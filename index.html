@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://*.openai.com https://*.anthropic.com https://*.googleapis.com https://openrouter.ai https://*.openrouter.ai https://cdn.jsdelivr.net ws://localhost:*; connect-src 'self' http://localhost:* https://*.openai.com https://*.anthropic.com https://*.googleapis.com https://openrouter.ai https://*.openrouter.ai https://cdn.jsdelivr.net ws://localhost:* wss://localhost:*; font-src 'self' data: https://cdn.jsdelivr.net; img-src 'self' data: https:; worker-src 'self' blob: https://cdn.jsdelivr.net;">
+    <title>Zoid Editor</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
