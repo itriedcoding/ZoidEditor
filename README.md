@@ -21,9 +21,9 @@ A free, open-source code editor with native AI integration, MCP server support, 
 
 | Platform | Download | Size |
 |----------|----------|------|
-| Windows 10/11 (64-bit) | [Download .exe](https://github.com/itriedcoding/ZoidEditor/releases/download/v1.0.0/Zoid.Editor-Setup-1.0.0.exe) | 141 MB |
+| Windows 10/11 (64-bit) | [Download .exe](https://github.com/itriedcoding/ZoidEditor/releases/download/v1.0.0/Zoid.Editor-Setup-1.0.0.exe) | 140 MB |
 | macOS (Intel + Apple Silicon) | [Download .dmg](https://github.com/itriedcoding/ZoidEditor/releases/latest) | via CI |
-| Linux (all distros) | [Download tar.gz](https://github.com/itriedcoding/ZoidEditor/releases/download/v1.0.0/Zoid.Editor-1.0.0-linux.tar.gz) | 16 MB |
+| Linux (all distros) | [Download tar.gz](https://github.com/itriedcoding/ZoidEditor/releases/download/v1.0.0/Zoid.Editor-1.0.0-linux.tar.gz) | 45 MB |
 | Linux (AppImage / deb) | [Latest Release](https://github.com/itriedcoding/ZoidEditor/releases/latest) | via CI |
 
 ## Getting Started
