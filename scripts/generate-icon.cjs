@@ -122,10 +122,10 @@ if (!fs.existsSync(BUILD_DIR)) {
   fs.mkdirSync(BUILD_DIR, { recursive: true });
 }
 
-// Generate 256x256 icon for installer
+// Generate 1024x1024 icon for installer (macOS requires >=512x512 for .icns)
 const iconPath = path.join(BUILD_DIR, 'icon.png');
 try {
-  const png = createIconPng(256);
+  const png = createIconPng(1024);
   fs.writeFileSync(iconPath, png);
   console.log(`✓ Generated icon: ${iconPath} (${png.length} bytes)`);
 } catch (err) {
@@ -158,7 +158,7 @@ function createIco(pngData) {
 
 const icoPath = path.join(BUILD_DIR, 'icon.ico');
 try {
-  const png = createIconPng(256);
+  const png = createIconPng(1024);
   const ico = createIco(png);
   fs.writeFileSync(icoPath, ico);
   console.log(`✓ Generated icon: ${icoPath} (${ico.length} bytes)`);

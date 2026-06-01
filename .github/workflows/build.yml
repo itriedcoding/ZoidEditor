@@ -30,6 +30,8 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
