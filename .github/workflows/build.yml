@@ -61,7 +61,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-build
-          path: release/
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+            release/*.tar.gz
+            release/*.blockmap
+            release/*.yml
           compression-level: 0
 
   release:
@@ -78,6 +86,12 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.zip
+            artifacts/**/*.AppImage
+            artifacts/**/*.deb
+            artifacts/**/*.tar.gz
           generate_release_notes: true
           make_latest: true
