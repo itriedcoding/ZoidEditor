@@ -527,6 +527,78 @@ section { position: relative; }
 .download-btns { margin: 24px 0; }
 .download-ver { font-size: 11px !important; color: rgba(255,255,255,0.2) !important; margin-top: 12px; }
 
+/* === VIRUSTOTAL SCAN BADGES === */
+.vt-result {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+}
+.vt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.vt-loading {
+  color: rgba(255,255,255,0.25);
+  cursor: default;
+}
+.vt-spin {
+  animation: vtSpin 1s linear infinite;
+}
+@keyframes vtSpin {
+  to { transform: rotate(360deg); }
+}
+.vt-clean {
+  color: #4ade80;
+  border: 1px solid rgba(74,222,128,0.2);
+  background: rgba(74,222,128,0.04);
+}
+.vt-clean:hover {
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.08);
+}
+.vt-malicious {
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.25);
+  background: rgba(248,113,113,0.05);
+}
+.vt-malicious:hover {
+  border-color: rgba(248,113,113,0.45);
+  background: rgba(248,113,113,0.1);
+}
+.vt-unknown {
+  color: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  background: transparent;
+}
+.vt-unknown:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.45);
+}
+.vt-na {
+  color: rgba(255,255,255,0.15);
+  cursor: default;
+  font-style: italic;
+}
+[data-theme="light"] .vt-loading { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .vt-clean { color: #16a34a; border-color: rgba(22,163,74,0.2); background: rgba(22,163,74,0.04); }
+[data-theme="light"] .vt-clean:hover { border-color: rgba(22,163,74,0.35); background: rgba(22,163,74,0.08); }
+[data-theme="light"] .vt-malicious { color: #dc2626; border-color: rgba(220,38,38,0.2); background: rgba(220,38,38,0.04); }
+[data-theme="light"] .vt-malicious:hover { border-color: rgba(220,38,38,0.35); background: rgba(220,38,38,0.08); }
+[data-theme="light"] .vt-unknown { color: rgba(0,0,0,0.2); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .vt-unknown:hover { border-color: rgba(0,0,0,0.15); color: rgba(0,0,0,0.35); }
+[data-theme="light"] .vt-na { color: rgba(0,0,0,0.12); }
+
 /* === FOOTER === */
 .footer { padding: 56px 24px; border-top: 1px solid rgba(255,255,255,0.04); }
 .footer-inner {

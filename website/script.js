@@ -405,6 +405,50 @@ function formatNum(n) {
   return String(n);
 }
 
+// ===== VIRUSTOTAL SCAN INTEGRATION =====
+async function loadVirusTotalScans() {
+  const els = document.querySelectorAll('.vt-result');
+  for (const el of els) {
+    const hash = el.dataset.hash;
+    const name = el.dataset.name || 'file';
+    if (!hash) {
+      el.innerHTML = `<span class="vt-badge vt-na">Not available until built by CI</span>`;
+      continue;
+    }
+    el.innerHTML = `<span class="vt-badge vt-loading">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="vt-spin"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Scanning on VirusTotal...
+    </span>`;
+    try {
+      const res = await fetch(`/api/virustotal?hash=${hash}`);
+      const data = await res.json();
+      if (data.scanned) {
+        const malicious = data.stats.malicious;
+        const total = data.total;
+        if (malicious > 0) {
+          el.innerHTML = `<a href="https://www.virustotal.com/gui/file/${hash}" target="_blank" rel="noopener" class="vt-badge vt-malicious">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            ${malicious}/${total} engines flagged
+          </a>`;
+        } else {
+          el.innerHTML = `<a href="https://www.virustotal.com/gui/file/${hash}" target="_blank" rel="noopener" class="vt-badge vt-clean">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Clean — 0/${total} detections
+          </a>`;
+        }
+      } else {
+        el.innerHTML = `<a href="https://www.virustotal.com/gui/file/${hash}" target="_blank" rel="noopener" class="vt-badge vt-unknown">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Not yet scanned — Submit to VirusTotal
+        </a>`;
+      }
+    } catch {
+      el.innerHTML = `<span class="vt-badge vt-unknown">VirusTotal scan unavailable</span>`;
+    }
+  }
+}
+
 // ===== INIT =====
 updateNavUI();
 loadDashboardStats();
+loadVirusTotalScans();
