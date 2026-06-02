@@ -3,7 +3,7 @@ import { useStore } from '../store';
 import { IconBranch, IconRefresh, IconChevronDown, IconChevronRight, IconX } from './Icons';
 
 function SourceControl() {
-  const { gitState, setGitState, toggleGitView, notify, openFolder } = useStore();
+  const { gitState, setGitState, setActiveView, notify, openFolder } = useStore();
   const [loading, setLoading] = useState(false);
   const [commitMsg, setCommitMsg] = useState('');
   const [showBranches, setShowBranches] = useState(false);
@@ -153,7 +153,7 @@ function SourceControl() {
     <div className="source-control-panel">
       <div className="sc-header">
         <span>SOURCE CONTROL</span>
-        <button className="sc-close-btn" onClick={toggleGitView}>
+        <button className="sc-close-btn" onClick={() => setActiveView('editor')}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
         </button>
       </div>

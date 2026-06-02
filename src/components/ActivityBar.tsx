@@ -1,18 +1,23 @@
-import { useStore } from '../store';
+import { useStore, ActiveView } from '../store';
 import { IconExplorer, IconSearch, IconBranch, IconTerminal, IconSettings, IconAI, IconExtensions, IconPlug, IconSnippet } from './Icons';
 
 function ActivityBar() {
-  const { view, toggleExplorer, toggleAIPanel, toggleTerminal, toggleSettings, toggleExtensionsView, toggleFindReplace, extensionsView, gitView, toggleGitView, mcpView, toggleMCPView, snippetsView, toggleSnippetsView } = useStore();
+  const { view, activeView, setActiveView, toggleExplorer, toggleTerminal, toggleFindReplace } = useStore();
+
+  const handleView = (id: ActiveView) => {
+    if (activeView === id) setActiveView('editor');
+    else setActiveView(id);
+  };
 
   const items = [
-    { id: 'explorer', icon: IconExplorer, title: 'Explorer (Ctrl+B)', active: view.explorer, onClick: toggleExplorer },
-    { id: 'extensions', icon: IconExtensions, title: 'Extensions', active: extensionsView, onClick: toggleExtensionsView },
-    { id: 'search', icon: IconSearch, title: 'Search (Ctrl+F)', active: view.findReplace, onClick: toggleFindReplace },
-    { id: 'source-control', icon: IconBranch, title: 'Source Control (Git)', active: gitView, onClick: toggleGitView },
-    { id: 'mcp', icon: IconPlug, title: 'MCP Servers', active: mcpView, onClick: toggleMCPView },
-    { id: 'snippets', icon: IconSnippet, title: 'Snippets', active: snippetsView, onClick: toggleSnippetsView },
-    { id: 'ai', icon: IconAI, title: 'AI Assistant (Ctrl+J)', active: view.aiPanel, onClick: toggleAIPanel },
-    { id: 'terminal', icon: IconTerminal, title: 'Terminal (Ctrl+`)', active: view.terminal, onClick: toggleTerminal },
+    { id: 'explorer' as const, icon: IconExplorer, title: 'Explorer (Ctrl+B)', active: view.explorer, onClick: toggleExplorer },
+    { id: 'extensions' as const, icon: IconExtensions, title: 'Extensions', active: activeView === 'extensions', onClick: () => handleView('extensions') },
+    { id: 'search' as const, icon: IconSearch, title: 'Search (Ctrl+F)', active: view.findReplace, onClick: toggleFindReplace },
+    { id: 'source-control' as const, icon: IconBranch, title: 'Source Control (Git)', active: activeView === 'source-control', onClick: () => handleView('source-control') },
+    { id: 'mcp' as const, icon: IconPlug, title: 'MCP Servers', active: activeView === 'mcp', onClick: () => handleView('mcp') },
+    { id: 'snippets' as const, icon: IconSnippet, title: 'Snippets', active: activeView === 'snippets', onClick: () => handleView('snippets') },
+    { id: 'ai' as const, icon: IconAI, title: 'AI Assistant (Ctrl+J)', active: activeView === 'ai', onClick: () => handleView('ai') },
+    { id: 'terminal' as const, icon: IconTerminal, title: 'Terminal (Ctrl+`)', active: activeView === 'terminal' || view.terminal, onClick: () => handleView('terminal') },
   ];
 
   return (
@@ -31,8 +36,8 @@ function ActivityBar() {
       </div>
       <div className="activitybar-bottom">
         <button
-          className={`activitybar-btn ${view.settings ? 'active' : ''}`}
-          onClick={toggleSettings}
+          className={`activitybar-btn ${activeView === 'settings' ? 'active' : ''}`}
+          onClick={() => handleView('settings')}
           title="Settings (Ctrl+,)"
         >
           <IconSettings size={18} />

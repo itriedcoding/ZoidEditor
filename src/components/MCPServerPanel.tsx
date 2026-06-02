@@ -3,7 +3,7 @@ import { useStore, MCPServer } from '../store';
 import { IconX, IconPlus, IconRefresh, IconCheck, IconPlug, IconTrash, IconMCP } from './Icons';
 
 function MCPServerPanel() {
-  const { mcpServers, addMCP, removeMCP, updateMCP, toggleMCP, toggleMCPView, notify } = useStore();
+  const { mcpServers, addMCP, removeMCP, updateMCP, toggleMCP, setActiveView, notify } = useStore();
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState('');
   const [command, setCommand] = useState('npx');
@@ -70,7 +70,7 @@ function MCPServerPanel() {
         </div>
         <div className="ai-header-actions">
           <button className="ai-action-btn" onClick={updateStatus} title="Refresh"><IconRefresh size={14} /></button>
-          <button className="ai-action-btn" onClick={() => toggleMCPView()} title="Close"><IconX size={14} /></button>
+          <button className="ai-action-btn" onClick={() => setActiveView('editor')} title="Close"><IconX size={14} /></button>
         </div>
       </div>
 

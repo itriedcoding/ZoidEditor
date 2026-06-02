@@ -243,7 +243,7 @@ function createMenu() {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
               title: 'About Zoid Editor',
-              message: 'Zoid Editor v1.0.0',
+              message: 'Zoid Editor v1.21.0',
               detail: 'Advanced Code Editor for Vibe Coders\n\nBuilt with Electron, React, Monaco Editor\n\nAI-powered coding with BYOK, free models, local models, and MCP server support.',
             });
           },
@@ -990,7 +990,7 @@ ipcMain.handle('mcp:start', async (_, config) => {
   };
 
   try {
-    await mcpCall('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'zoid-editor', version: '1.0.0' } });
+    await mcpCall('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'zoid-editor', version: '1.21.0' } });
     mcpSendMessage(proc, { jsonrpc: '2.0', method: 'notifications/initialized' });
     const toolsResult = await mcpCall('tools/list', {}, 15000);
     const tools = toolsResult.result?.tools || [];

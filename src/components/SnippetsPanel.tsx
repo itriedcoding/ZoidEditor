@@ -4,7 +4,7 @@ import { IconX, IconPlus, IconTrash, IconCopy, IconSnippet } from './Icons';
 import { detectLanguage } from '../services/ai';
 
 function SnippetsPanel() {
-  const { snippets, addSnippet, removeSnippet, toggleSnippetsView, tabs, activeTabId, applySuggestion, notify } = useStore();
+  const { snippets, addSnippet, removeSnippet, setActiveView, tabs, activeTabId, applySuggestion, notify } = useStore();
   const [showAdd, setShowAdd] = useState(false);
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
@@ -26,7 +26,7 @@ function SnippetsPanel() {
           <span>Snippets</span>
         </div>
         <div className="ai-header-actions">
-          <button className="ai-action-btn" onClick={() => toggleSnippetsView()} title="Close"><IconX size={14} /></button>
+          <button className="ai-action-btn" onClick={() => setActiveView('editor')} title="Close"><IconX size={14} /></button>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { useStore } from '../store';
 import { IconExplorer, IconAI, IconTerminal, IconSettings, IconMinimize, IconMaximize, IconRestore, IconClose } from './Icons';
 
 function TitleBar() {
-  const { tabs, activeTabId, toggleExplorer, toggleAIPanel, toggleSettings, toggleTerminal, view } = useStore();
+  const { tabs, activeTabId, toggleExplorer, setActiveView, activeView } = useStore();
   const [isMaximized, setIsMaximized] = useState(false);
   const [platform, setPlatform] = useState('win32');
   const activeTab = tabs.find(t => t.id === activeTabId);
@@ -49,13 +49,13 @@ function TitleBar() {
 
         <div className="titlebar-end">
           <div className="tb-actions">
-            <button className={`tb-btn ${view.settings ? 'active' : ''}`} onClick={() => toggleSettings()} title="Settings (Ctrl+,)">
+            <button className={`tb-btn ${activeView === 'settings' ? 'active' : ''}`} onClick={() => setActiveView('settings')} title="Settings (Ctrl+,)">
               <IconSettings size={15} />
             </button>
-            <button className="tb-btn" onClick={() => toggleAIPanel()} title="AI Assistant (Ctrl+J)">
+            <button className="tb-btn" onClick={() => setActiveView('ai')} title="AI Assistant (Ctrl+J)">
               <IconAI size={15} />
             </button>
-            <button className="tb-btn" onClick={() => toggleTerminal()} title="Terminal (Ctrl+`)">
+            <button className="tb-btn" onClick={() => setActiveView('terminal')} title="Terminal (Ctrl+`)">
               <IconTerminal size={15} />
             </button>
           </div>

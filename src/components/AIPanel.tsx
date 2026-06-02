@@ -10,7 +10,7 @@ function AIPanel() {
   const {
     aiChat, aiLoading, aiModels, settings, customModels,
     addAIMessage, clearAIChat, setAILoading,
-    toggleAIPanel, addCustomModel, removeCustomModel, updateSettings, applySuggestion, notify,
+      setActiveView, addCustomModel, removeCustomModel, updateSettings, applySuggestion, notify,
   } = useStore();
 
   const [input, setInput] = useState('');
@@ -110,7 +110,7 @@ function AIPanel() {
           <button className="ai-action-btn" onClick={clearAIChat} title="Clear chat">
             <IconClear size={14} />
           </button>
-          <button className="ai-action-btn" onClick={() => toggleAIPanel()} title="Close panel">
+          <button className="ai-action-btn" onClick={() => setActiveView('editor')} title="Close panel">
             <IconX size={14} />
           </button>
         </div>

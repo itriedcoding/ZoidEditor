@@ -5,7 +5,6 @@ import {
   getFileIconComponent, IconNewFile, IconNewFolder, IconTrash, IconRefresh
 } from './Icons';
 import GitHubLogin from './GitHubLogin';
-import ExtensionsView from './ExtensionsView';
 
 interface SidebarProps {
   openFolder: string | null;
@@ -48,7 +47,7 @@ function FileTreeNode({ node, depth, onOpenFile, onContextMenu }: { node: TreeNo
 }
 
 function Sidebar({ openFolder, onOpenFolder, onOpenFile, onRefreshFolder }: SidebarProps) {
-  const { fileTree, tabs, activeTabId, closeTab, notify, extensionsView, toggleExtensionsView, showContextMenu } = useStore();
+  const { fileTree, tabs, activeTabId, closeTab, notify, showContextMenu } = useStore();
   const [showOpenFiles, setShowOpenFiles] = useState(true);
   const [showWorkspace, setShowWorkspace] = useState(true);
 
@@ -198,12 +197,6 @@ function Sidebar({ openFolder, onOpenFolder, onOpenFile, onRefreshFolder }: Side
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {extensionsView && (
-        <div className="sidebar-section" style={{ flex: openFolder ? '0 0 auto' : 1, overflow: 'auto', borderTop: '1px solid var(--border-color)' }}>
-          <ExtensionsView />
         </div>
       )}
 

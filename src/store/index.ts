@@ -73,10 +73,10 @@ const defaultSettings: Settings = {
   temperature: 0.7, maxTokens: 4096,
 };
 
+export type ActiveView = 'editor' | 'extensions' | 'search' | 'source-control' | 'mcp' | 'snippets' | 'ai' | 'terminal' | 'settings';
+
 export interface ViewState {
   explorer: boolean;
-  aiPanel: boolean;
-  settings: boolean;
   terminal: boolean;
   findReplace: boolean;
 }
@@ -126,13 +126,12 @@ interface AppState {
   findReplace: FindReplaceState;
   cursorPosition: { lineNumber: number; column: number };
   commandPalette: boolean;
+  activeView: ActiveView;
   githubUser: any | null;
   githubToken: string;
   detectedLocalModels: AIModel[];
   installedExtensions: string[];
-  extensionsView: boolean;
   findController: any | null;
-  gitView: boolean;
   gitState: {
     isRepo: boolean;
     status: any;
@@ -142,17 +141,14 @@ interface AppState {
   };
   mcpServers: MCPServer[];
   snippets: Snippet[];
-  mcpView: boolean;
-  snippetsView: boolean;
 
   addTab: (tab: Omit<Tab, 'id' | 'isDirty'>) => void;
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
   updateFileContent: (id: string, content: string) => void;
   setFileTree: (tree: any[]) => void;
+  setActiveView: (view: ActiveView) => void;
   toggleExplorer: () => void;
-  toggleAIPanel: () => void;
-  toggleSettings: () => void;
   toggleTerminal: () => void;
   toggleFindReplace: () => void;
   toggleCommandPalette: () => void;
@@ -177,9 +173,7 @@ interface AppState {
   setInstalledExtensions: (exts: string[]) => void;
   addInstalledExtension: (name: string) => void;
   removeInstalledExtension: (name: string) => void;
-  toggleExtensionsView: () => void;
   setFindController: (ctrl: any | null) => void;
-  toggleGitView: () => void;
   setGitState: (state: Partial<AppState['gitState']>) => void;
   setOpenFolder: (folder: string | null) => void;
   addMCP: (server: MCPServer) => void;
@@ -188,8 +182,6 @@ interface AppState {
   toggleMCP: (id: string) => void;
   addSnippet: (snippet: Snippet) => void;
   removeSnippet: (id: string) => void;
-  toggleMCPView: () => void;
-  toggleSnippetsView: () => void;
 }
 
 const loadSettings = (): Settings => {
@@ -286,7 +278,8 @@ const localModels: AIModel[] = [
 
 export const useStore = create<AppState>((set, get) => ({
   tabs: [], activeTabId: null, openFolder: null, fileTree: [],
-  view: { explorer: true, aiPanel: false, settings: false, terminal: false, findReplace: false },
+  view: { explorer: true, terminal: false, findReplace: false },
+  activeView: 'editor',
   aiChat: loadChat(), aiLoading: false,
   aiModels: [...freeModels, ...apiKeyModels, ...localModels],
   settings: loadSettings(),
@@ -300,14 +293,10 @@ export const useStore = create<AppState>((set, get) => ({
   githubToken: '',
   detectedLocalModels: [],
   installedExtensions: [],
-  extensionsView: false,
   findController: null,
-  gitView: false,
   gitState: { isRepo: false, status: null, branches: [], currentBranch: '', log: [] },
   mcpServers: loadMCPServers(),
   snippets: loadSnippets(),
-  mcpView: false,
-  snippetsView: false,
 
   applySuggestion: (code) => {
     const s = get();
@@ -350,9 +339,8 @@ export const useStore = create<AppState>((set, get) => ({
   setActiveTab: (id) => set({ activeTabId: id }),
   updateFileContent: (id, content) => set(s => ({ tabs: s.tabs.map(t => t.id === id ? { ...t, content, isDirty: true } : t) })),
   setFileTree: (t) => set({ fileTree: t }),
+  setActiveView: (view) => set({ activeView: view }),
   toggleExplorer: () => set(s => ({ view: { ...s.view, explorer: !s.view.explorer } })),
-  toggleAIPanel: () => set(s => ({ view: { ...s.view, aiPanel: !s.view.aiPanel } })),
-  toggleSettings: () => set(s => ({ view: { ...s.view, settings: !s.view.settings } })),
   toggleTerminal: () => set(s => ({ view: { ...s.view, terminal: !s.view.terminal } })),
   setAILoading: (l) => set({ aiLoading: l }),
 
@@ -402,9 +390,7 @@ export const useStore = create<AppState>((set, get) => ({
   setInstalledExtensions: (exts) => set({ installedExtensions: exts }),
   addInstalledExtension: (name) => set(s => ({ installedExtensions: [...s.installedExtensions.filter(e => e !== name), name] })),
   removeInstalledExtension: (name) => set(s => ({ installedExtensions: s.installedExtensions.filter(e => e !== name) })),
-  toggleExtensionsView: () => set(s => ({ extensionsView: !s.extensionsView })),
   setFindController: (ctrl) => set({ findController: ctrl }),
-  toggleGitView: () => set(s => ({ gitView: !s.gitView })),
   setGitState: (state) => set(s => ({ gitState: { ...s.gitState, ...state } })),
   setOpenFolder: (folder) => set({ openFolder: folder }),
 
@@ -456,6 +442,5 @@ export const useStore = create<AppState>((set, get) => ({
     });
   },
 
-  toggleMCPView: () => set(s => ({ mcpView: !s.mcpView })),
-  toggleSnippetsView: () => set(s => ({ snippetsView: !s.snippetsView })),
+
 }));

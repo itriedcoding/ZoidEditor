@@ -10,7 +10,7 @@ function StatusBar() {
     <div className="statusbar">
       <div className="statusbar-left">
         {gitState.isRepo && gitState.currentBranch && (
-          <span className="status-item" title="Git Branch" onClick={() => useStore.getState().toggleGitView()}>
+          <span className="status-item" title="Git Branch" onClick={() => useStore.getState().setActiveView('source-control')}>
             <IconBranch size={13} />
             {gitState.currentBranch}
           </span>

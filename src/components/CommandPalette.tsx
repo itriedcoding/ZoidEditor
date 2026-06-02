@@ -10,16 +10,16 @@ interface Command {
 }
 
 function CommandPalette() {
-  const { commandPalette, closeCommandPalette, toggleExplorer, toggleAIPanel, toggleTerminal, toggleSettings, toggleFindReplace } = useStore();
+  const { commandPalette, closeCommandPalette, toggleExplorer, setActiveView, toggleTerminal, toggleFindReplace } = useStore();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const commands: Command[] = [
     { id: 'toggle-explorer', label: 'Toggle Explorer Sidebar', shortcut: 'Ctrl+B', category: 'View', action: toggleExplorer },
-    { id: 'toggle-ai', label: 'Toggle AI Assistant Panel', shortcut: 'Ctrl+J', category: 'View', action: toggleAIPanel },
-    { id: 'toggle-terminal', label: 'Toggle Terminal', shortcut: 'Ctrl+`', category: 'View', action: toggleTerminal },
-    { id: 'toggle-settings', label: 'Open Settings', shortcut: 'Ctrl+,', category: 'Preferences', action: toggleSettings },
+    { id: 'toggle-ai', label: 'AI Assistant', shortcut: 'Ctrl+J', category: 'View', action: () => setActiveView('ai') },
+    { id: 'toggle-terminal', label: 'Terminal', shortcut: 'Ctrl+`', category: 'View', action: () => setActiveView('terminal') },
+    { id: 'toggle-settings', label: 'Open Settings', shortcut: 'Ctrl+,', category: 'Preferences', action: () => setActiveView('settings') },
     { id: 'find', label: 'Find in File', shortcut: 'Ctrl+F', category: 'Edit', action: toggleFindReplace },
     { id: 'toggle-dark', label: 'Toggle Dark/Light Theme', category: 'Preferences', action: () => {
       const s = useStore.getState();

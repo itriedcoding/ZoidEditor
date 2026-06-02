@@ -17,6 +17,7 @@ import CommandPalette from './components/CommandPalette';
 import Notifications from './components/Notifications';
 import { detectAllLocalModels } from './services/detect-local';
 import SourceControl from './components/SourceControl';
+import ExtensionsView from './components/ExtensionsView';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -26,10 +27,9 @@ function App() {
 
   const {
     view, tabs, activeTabId, settings, addTab, setActiveTab, closeTab,
-    setFileTree, toggleAIPanel, toggleSettings, toggleTerminal,
+    setFileTree, activeView, setActiveView, toggleTerminal,
     toggleExplorer, toggleFindReplace, toggleCommandPalette, closeCommandPalette,
-    showContextMenu, updateSettings, gitView, openFolder, setOpenFolder,
-    mcpView, snippetsView,
+    showContextMenu, updateSettings, openFolder, setOpenFolder,
   } = useStore();
 
   const handleOpenFile = useCallback(async (filePath: string) => {
@@ -128,7 +128,7 @@ function App() {
   // Store handlers in ref for menu action callbacks
   handlersRef.current = {
     handleNewFile, handleOpenFile, handleOpenFolder, handleSave, handleSaveAs,
-    toggleExplorer, toggleAIPanel, toggleTerminal, toggleSettings,
+    toggleExplorer, toggleTerminal, setActiveView,
   };
 
   useEffect(() => {
@@ -144,9 +144,9 @@ function App() {
             case 'save': h.handleSave?.(); break;
             case 'save-as': h.handleSaveAs?.(); break;
             case 'toggle-explorer': h.toggleExplorer?.(); break;
-            case 'toggle-ai': h.toggleAIPanel?.(); break;
+            case 'toggle-ai': h.setActiveView?.('ai'); break;
             case 'toggle-terminal': h.toggleTerminal?.(); break;
-            case 'settings': h.toggleSettings?.(); break;
+            case 'settings': h.setActiveView?.('settings'); break;
           }
         });
 
@@ -231,8 +231,8 @@ function App() {
     if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); handleNewFile(); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); toggleFindReplace(); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); toggleExplorer(); return; }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'j') { e.preventDefault(); toggleAIPanel(); return; }
-    if ((e.ctrlKey || e.metaKey) && e.key === '`') { e.preventDefault(); toggleTerminal(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'j') { e.preventDefault(); setActiveView(activeView === 'ai' ? 'editor' : 'ai'); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key === '`') { e.preventDefault(); setActiveView(activeView === 'terminal' ? 'editor' : 'terminal'); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 'w') { e.preventDefault(); if (activeTabId) closeTab(activeTabId); return; }
     if ((e.ctrlKey || e.metaKey) && e.key === 'o') { e.preventDefault(); handleOpenFilesFromDialog(); return; }
     // Ctrl+Tab / Ctrl+Shift+Tab
@@ -248,7 +248,7 @@ function App() {
     }
     if (e.key === 'Escape' && view.findReplace) { e.preventDefault(); toggleFindReplace(); return; }
     if (e.key === 'Escape') { closeCommandPalette(); return; }
-  }, [handleSave, handleNewFile, toggleFindReplace, toggleExplorer, toggleAIPanel, toggleTerminal, toggleCommandPalette, closeCommandPalette, view.findReplace, activeTabId, tabs, closeTab, setActiveTab, handleOpenFilesFromDialog]);
+  }, [handleSave, handleNewFile, toggleFindReplace, toggleExplorer, setActiveView, activeView, toggleTerminal, toggleCommandPalette, closeCommandPalette, view.findReplace, activeTabId, tabs, closeTab, setActiveTab, handleOpenFilesFromDialog]);
 
   useEffect(() => {
     const handleDrop = (e: DragEvent) => {
@@ -283,82 +283,94 @@ function App() {
     );
   }
 
+  const renderFullPageView = () => {
+    switch (activeView) {
+      case 'extensions':
+        return <div className="main-area full-page-view"><ExtensionsView /></div>;
+      case 'source-control':
+        return <div className="main-area full-page-view"><SourceControl /></div>;
+      case 'mcp':
+        return <div className="main-area full-page-view"><MCPServerPanel /></div>;
+      case 'snippets':
+        return <div className="main-area full-page-view"><SnippetsPanel /></div>;
+      case 'ai':
+        return <div className="main-area full-page-view"><AIPanel /></div>;
+      case 'terminal':
+        return <div className="main-area full-page-view"><TerminalPanel /></div>;
+      case 'settings':
+        return <div className="main-area full-page-view"><Settings /></div>;
+      default:
+        return null;
+    }
+  };
+
+  const renderEditorView = () => (
+    <>
+      <div className={`sidebar-wrap ${view.explorer ? 'visible' : 'hidden'}`}>
+        <Sidebar openFolder={openFolder} onOpenFolder={handleOpenFolder}
+          onOpenFile={handleOpenFile} onFileDrop={handleOpenFile}
+          onRefreshFolder={async () => {
+            if (openFolder && (window as any).electronAPI?.file?.readTree) {
+              const tree = await (window as any).electronAPI.file.readTree(openFolder);
+              setFileTree(tree || []);
+            }
+          }} />
+      </div>
+      <div className="main-area">
+        {view.findReplace && <FindReplace />}
+        <TabBar />
+        <div className={`editor-area ${tabs.length === 0 ? 'empty' : ''}`}>
+          {tabs.length > 0 ? (
+            tabs.map(tab => (
+              <div key={tab.id} className={`editor-wrapper ${tab.id === activeTabId ? 'active' : 'hidden'}`}>
+                <Editor tab={tab} />
+              </div>
+            ))
+          ) : (
+            <div className="welcome-screen">
+              <div className="welcome-logo">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <rect x="4" y="4" width="72" height="72" rx="16" stroke="currentColor" strokeWidth="2" />
+                  <path d="M20 52l16-24 16 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M20 36l40 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <h1>Zoid Editor</h1>
+              <p className="welcome-sub">Open a file or folder to get started</p>
+              <div className="welcome-actions">
+                <button onClick={handleOpenFolder}>Open Folder</button>
+                <button onClick={handleNewFile}>New File</button>
+                <button onClick={handleOpenFilesFromDialog}>Open File</button>
+                <button onClick={() => { useStore.getState().updateSettings({ theme: darkMode ? 'white-black' as any : 'black-white' as any }); }}>Toggle Theme</button>
+              </div>
+              <div className="welcome-shortcuts">
+                <div><kbd>Ctrl+Shift+P</kbd> Command Palette</div>
+                <div><kbd>Ctrl+N</kbd> New File</div>
+                <div><kbd>Ctrl+O</kbd> Open File</div>
+                <div><kbd>Ctrl+S</kbd> Save</div>
+                <div><kbd>Ctrl+W</kbd> Close Tab</div>
+                <div><kbd>Ctrl+Tab</kbd> Next Tab</div>
+                <div><kbd>Ctrl+F</kbd> Find</div>
+                <div><kbd>Ctrl+J</kbd> AI Assistant</div>
+                <div><kbd>Ctrl+B</kbd> Explorer</div>
+                <div><kbd>Ctrl+`</kbd> Terminal</div>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className={`terminal-wrap ${view.terminal ? 'visible' : 'hidden'}`}>
+          <TerminalPanel />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className={`app ${darkMode ? 'dark' : 'light'}`} ref={appRef} onContextMenu={handleContextMenu} onKeyDown={handleKeyDown} tabIndex={0}>
       <TitleBar />
       <div className="app-body">
         <ActivityBar />
-        <div className={`sidebar-wrap ${view.explorer ? 'visible' : 'hidden'}`}>
-          <Sidebar openFolder={openFolder} onOpenFolder={handleOpenFolder}
-            onOpenFile={handleOpenFile} onFileDrop={handleOpenFile}
-            onRefreshFolder={async () => {
-              if (openFolder && (window as any).electronAPI?.file?.readTree) {
-                const tree = await (window as any).electronAPI.file.readTree(openFolder);
-                setFileTree(tree || []);
-              }
-            }} />
-        </div>
-        <div className={`sidebar-wrap ${gitView ? 'visible' : 'hidden'}`}>
-          <SourceControl />
-        </div>
-        <div className={`sidebar-wrap ${mcpView ? 'visible' : 'hidden'}`}>
-          <MCPServerPanel />
-        </div>
-        <div className={`sidebar-wrap ${snippetsView ? 'visible' : 'hidden'}`}>
-          <SnippetsPanel />
-        </div>
-        <div className="main-area">
-          {view.findReplace && <FindReplace />}
-          <TabBar />
-          <div className={`editor-area ${tabs.length === 0 ? 'empty' : ''}`}>
-            {tabs.length > 0 ? (
-              tabs.map(tab => (
-                <div key={tab.id} className={`editor-wrapper ${tab.id === activeTabId ? 'active' : 'hidden'}`}>
-                  <Editor tab={tab} />
-                </div>
-              ))
-            ) : (
-              <div className="welcome-screen">
-                <div className="welcome-logo">
-                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                    <rect x="4" y="4" width="72" height="72" rx="16" stroke="currentColor" strokeWidth="2" />
-                    <path d="M20 52l16-24 16 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M20 36l40 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <h1>Zoid Editor</h1>
-                <p className="welcome-sub">Open a file or folder to get started</p>
-                <div className="welcome-actions">
-                  <button onClick={handleOpenFolder}>Open Folder</button>
-                  <button onClick={handleNewFile}>New File</button>
-                  <button onClick={handleOpenFilesFromDialog}>Open File</button>
-                  <button onClick={() => { useStore.getState().updateSettings({ theme: darkMode ? 'white-black' as any : 'black-white' as any }); }}>Toggle Theme</button>
-                </div>
-                <div className="welcome-shortcuts">
-                  <div><kbd>Ctrl+Shift+P</kbd> Command Palette</div>
-                  <div><kbd>Ctrl+N</kbd> New File</div>
-                  <div><kbd>Ctrl+O</kbd> Open File</div>
-                  <div><kbd>Ctrl+S</kbd> Save</div>
-                  <div><kbd>Ctrl+W</kbd> Close Tab</div>
-                  <div><kbd>Ctrl+Tab</kbd> Next Tab</div>
-                  <div><kbd>Ctrl+F</kbd> Find</div>
-                  <div><kbd>Ctrl+J</kbd> AI Assistant</div>
-                  <div><kbd>Ctrl+B</kbd> Explorer</div>
-                  <div><kbd>Ctrl+`</kbd> Terminal</div>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className={`terminal-wrap ${view.terminal ? 'visible' : 'hidden'}`}>
-            <TerminalPanel />
-          </div>
-        </div>
-        <div className={`ai-wrap ${view.aiPanel ? 'visible' : 'hidden'}`}>
-          <AIPanel />
-        </div>
-      </div>
-      <div className={`settings-overlay ${view.settings ? 'visible' : ''}`} onClick={toggleSettings}>
-        <div className="settings-wrap" onClick={e => e.stopPropagation()}><Settings /></div>
+        {activeView === 'editor' ? renderEditorView() : renderFullPageView()}
       </div>
       <StatusBar />
       <CommandPalette />

@@ -466,3 +466,52 @@ body { font-family: var(--font-sans); background: var(--bg-primary); color: var(
 .sc-commit-hash { font-family: var(--font-mono); color: var(--text-tertiary); font-size: 10px; }
 .sc-commit-msg { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sc-commit-date { color: var(--text-muted); font-size: 10px; flex-shrink: 0; }
+
+/* ========== FULL-PAGE VIEWS ========== */
+.full-page-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.full-page-view .ai-panel {
+  width: 100%;
+  border-left: none;
+}
+.full-page-view .extensions-view {
+  max-height: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.full-page-view .extensions-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.full-page-view .source-control-panel {
+  border-right: none;
+}
+.full-page-view .settings-panel {
+  border: none;
+  border-radius: 0;
+  height: 100%;
+}
+.full-page-view .terminal-panel {
+  background: var(--bg-secondary);
+}
+.full-page-view .terminal-native-body {
+  gap: 16px;
+}
+.full-page-view .terminal-native-icon {
+  margin-bottom: 8px;
+}
+.full-page-view .terminal-native-detail {
+  font-size: 15px;
+  gap: 12px;
+}
+.full-page-view .terminal-native-btn {
+  padding: 14px 48px;
+  font-size: 15px;
+  margin-top: 12px;
+}

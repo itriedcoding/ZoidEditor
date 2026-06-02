@@ -3,7 +3,7 @@ import { useStore, AIModel } from '../store';
 import { IconCheck, IconX, IconAI, IconSettings as IconSettingsIcon, IconExplorer, IconTerminal } from './Icons';
 
 function Settings() {
-  const { settings, customModels, updateSettings, addCustomModel, removeCustomModel, toggleSettings, notify } = useStore();
+  const { settings, customModels, updateSettings, addCustomModel, removeCustomModel, setActiveView, notify } = useStore();
   const [section, setSection] = useState<'keys' | 'editor' | 'ai' | 'about'>('keys');
   const [showAddModel, setShowAddModel] = useState(false);
   const [newModel, setNewModel] = useState<{ name: string; provider: AIModel['provider']; model: string; baseUrl: string }>({ name: '', provider: 'openai', model: '', baseUrl: '' });
@@ -20,7 +20,7 @@ function Settings() {
     <div className="settings-panel">
       <div className="settings-header">
         <h2><IconSettingsIcon size={18} /> Settings</h2>
-        <button onClick={toggleSettings} className="settings-close"><IconX size={16} /></button>
+        <button onClick={() => setActiveView('editor')} className="settings-close"><IconX size={16} /></button>
       </div>
 
       <div className="settings-body">
@@ -180,7 +180,7 @@ function Settings() {
                   <path d="M16 26l32 0" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <h2>Zoid Editor v1.0.0</h2>
+              <h2>Zoid Editor v1.21.0</h2>
               <p>A lightweight, AI-powered code editor built with Electron, React, and Monaco.</p>
               <p className="about-tech">Electron + React + TypeScript + Vite + Monaco Editor + Zustand</p>
             </div>
